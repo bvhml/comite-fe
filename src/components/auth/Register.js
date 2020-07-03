@@ -136,16 +136,15 @@ export default function Register (props){
           
         Auth.signUp(email, password,nombre,apellido)
           .then(res => {
-            if (res === false) {
+            if (res.status === 400) {
               setState(state => ({
                 ...state,
-                messageDialog:"El correo ya esta en uso.",
+                messageDialog:res.err,
                 showDialog:true,
               }));
-              return alert("El correo ya esta en uso.");
               
             }
-            else{
+            else if (res.status === 200){
               setState(state => ({
                 ...state,
                 messageDialog:"Creado con exito",
@@ -156,7 +155,7 @@ export default function Register (props){
           .catch(err => {
             setState(state => ({
               ...state,
-              messageDialog:"Correo ya esta en uso.",
+              messageDialog:"Ha ocurrido un error, intenta mas tarde",
               showDialog:true,
             }));
             //alert(err);

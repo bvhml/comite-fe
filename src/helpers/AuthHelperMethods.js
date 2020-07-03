@@ -25,7 +25,7 @@ export default class AuthHelperMethods {
 
     }
 
-    signUp = (username, password,nombre,apellido) => {
+    signUp = (username,password,nombre,apellido) => {
       // Get a token from api server using the fetch api
       var config = {};
       if (this.loggedIn()) {
@@ -42,7 +42,8 @@ export default class AuthHelperMethods {
         },config)
         .then(this._checkStatus)
         .then(response => {
-          this.login(username,password);
+          //this.login(username,password)
+          return response.data;
         });
   
       }
