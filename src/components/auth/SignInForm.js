@@ -19,9 +19,7 @@ import AuthHelperMethods from '../../helpers/AuthHelperMethods';
 import Paper from '@material-ui/core/Paper';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-
-
-export const validatorArg = new FormValidator([
+const validatorArg = new FormValidator([
   {
     field: 'email',
     method: validator.isEmpty,
@@ -39,207 +37,161 @@ export const validatorArg = new FormValidator([
 
 let validationResponse =  {};
 
-export default function SignInForm (props) {
+export default function SignInForm ({classes, mobile}) {
+
+
+  const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
+  const { from } = { from: { pathname: "/me" } };
+  const [state,setState] = useState({
+    email:'',
+    password:'',
+    messageDialog:'',
+    showDialog:false,
+  });
+
+  const [ formState, setFormState ] = useState({
+    email:{value:'',errorMessage:''},
+    password:{value:'',errorMessage:''}
+  });
+
+  useEffect(() =>{
+    if (!Auth.loggedIn()){
+      Auth.logout();
+    }
+  }, [Auth]);
   
-    const [state,setState] = useState({
-      email:'',
-      password:'',
-      messageDialog:'',
-      showDialog:false,
-    });
-
-    const [ formState, setFormState ] = useState({
-      email:{value:'',errorMessage:''},
-      password:{value:'',errorMessage:''}
-    });
-      
-    let emailInput = React.createRef();
+  function handleSubmit(event){
     
-    let Auth = new AuthHelperMethods();
-
-    useEffect(() =>{
-      let Authenticate = new AuthHelperMethods();
-      if (Authenticate.loggedIn()){
-        //this.props.history.replace('/');
-        //console.log("Ya inicie sesion");
-      }
-      else{
-        //console.log("No inicie sesion");
-        Authenticate.logout();
-      }
-    }, []);
+    event.preventDefault();
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+    const validation = validatorArg.validate({email:email,password:password});
+    setFormState({email:{value:email,errorMessage:validation.email.message},password:{value:password,errorMessage:validation.password.message}});
+    validationResponse = {email: validation.email.isInvalid,password:validation.password.isInvalid}
     
-    function handleSubmit(event){
-     
-      event.preventDefault();
-
-
-      const email = event.target.email.value;
-      const password = event.target.password.value;
-      const validation = validatorArg.validate({email:email,password:password});
-      setFormState({email:{value:email,errorMessage:validation.email.message},password:{value:password,errorMessage:validation.password.message}});
-    
-
-      validationResponse = {email: validation.email.isInvalid,password:validation.password.isInvalid}
-      
-
-      if (validation.isValid) {
-        //console.log("TODO BIEN");
-          
-
-        Auth.login(email, password)
-          .then(res => {
-            if (res.data.status === 400) {
-              setState(state => ({
-                ...state,
-                messageDialog:"Usuario/Password no son correctos",
-                showDialog:true,
-              }));
-              //return alert("Usuario/Password no son correctos");
-              
-            }
-            else if (res.data.status === 200){
-              
-                //this.props.history.replace('/');
-                console.log("Respuesto correcta de Log In");
-                
-                setState(state => ({
-                  ...state,
-                  email:email,
-                  password:password,
-                }));
-            }
-          })
-          .catch(err => {
+    if (validation.isValid) {
+      Auth.login(email, password)
+        .then(res => {
+          if (res.data.status === 400) {
             setState(state => ({
               ...state,
               messageDialog:"Usuario/Password no son correctos",
               showDialog:true,
             }));
-          });
+          }
+          else if (res.data.status === 200){
+            setState(state => ({
+              ...state,
+              email:email,
+              password:password,
+            }));
+          }
+        })
+        .catch(err => {
+          setState(state => ({
+            ...state,
+            messageDialog:"Usuario/Password no son correctos",
+            showDialog:true,
+          }));
+        });
+    }
+  }
+  
+  function handleClose() { 
+    setState(state => ({
+      ...state,
+      showDialog:false
+    }));
+  } 
 
-      }
-      else{
-        //if is Invalid
-        
-      }
-      
-      setState(state => ({
-        ...state,
-        email:email,
-        password:password,
-      }));
-      
-      return;
+  if (Auth.loggedIn()) {
+    return <Redirect to={from}/>;
+  }
+    return(
+      <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'6vh'}}>
+        <CssBaseline />
+        <Grid container item xs={12} md={7} lg={5} component={Paper} elevation={7} square justify={'center'} >
+          <Grid container item className={classes.paper} justify={'center'}>
+          <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+              Iniciar sesion
+          </Typography>
+          <form className={classes.form} onSubmit={handleSubmit} noValidate autoComplete={'false'}>
+                <TextField
+                variant="outlined"
+                margin="dense"
+                required
+                fullWidth
+                id="email"
+                label="Usuario"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                error={validationResponse.email}
+                helperText={formState.email.errorMessage}
+                />
+                <TextField
+                variant="outlined"
+                margin="dense"
+                required
+                fullWidth
+                name="password"
+                label="Contraseña"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                error={validationResponse.password}
+                helperText={formState.password.errorMessage}
+                />
+                <Dialog
+                  open={state.showDialog}
+                  onClose={handleClose}
+                  aria-labelledby="alert-dialog-title"
+                  aria-describedby="alert-dialog-description"
+                >
+                  <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
+                  <DialogContent className={classes.dialogContent}>
+                  <Avatar  className={classes.bigAvatar} >
+                  <Info className={classes.icon} />
+                  </Avatar>
+                    <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
+                      {state.messageDialog}
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} autoFocus>
+                      Cerrar
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  >
+                  Iniciar sesion
+                </Button>
+                <Grid container>
+                {/*<Grid item xs>
 
-      }
-    
-
-      function handleClose() { 
-        setState(state => ({
-          ...state,
-          showDialog:false
-        }));
-      }
-
-      
-
-   
-        const {classes} = props;
-        
-        let { from } = { from: { pathname: "/me" } };
-    
-
-        if (Auth.loggedIn()) {
-          return <Redirect to={from}/>;
-        }
-        return(
-          <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'}>
-          <CssBaseline />
-              <Grid container item xs={12} sm={7} md={5} component={Paper} elevation={7} square justify={'center'} >
-                <Grid container item className={classes.paper} justify={'center'}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Sign in
-                </Typography>
-                <form className={classes.form} onSubmit={handleSubmit} noValidate autoComplete={'false'}>
-                      <TextField
-                      variant="outlined"
-                      margin="dense"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                      autoFocus
-                      error={validationResponse.email}
-                      helperText={formState.email.errorMessage}
-                      inputRef={emailInput}
-                      
-                      />
-                      <TextField
-                      variant="outlined"
-                      margin="dense"
-                      required
-                      fullWidth
-                      name="password"
-                      label="Password"
-                      type="password"
-                      id="password"
-                      autoComplete="current-password"
-                      error={validationResponse.password}
-                      helperText={formState.password.errorMessage}
-                      />
-                      <Dialog
-                        open={state.showDialog}
-                        onClose={handleClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                      >
-                        <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
-                        <DialogContent className={classes.dialogContent}>
-                        <Avatar  className={classes.bigAvatar} >
-                        <Info className={classes.icon} />
-                        </Avatar>
-                          <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
-                            {state.messageDialog}
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button onClick={handleClose} autoFocus>
-                            Dismiss
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
-                      <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                        >
-                        Sign In
-                      </Button>
-                      <Grid container>
-                      {/*<Grid item xs>
-
-                      <LinkRouter.Link to="/" component={Link} className={classes.Link} style={{ textDecoration: 'none' }}>
-                        Forgot password?
-                      </LinkRouter.Link>
-                      </Grid>*/}
-                      <Grid item>
-                      <LinkRouter.Link to="/register" className={classes.Link} style={{ textDecoration: 'none' }}>
-                        Don't have an account? Sign Up
-                      </LinkRouter.Link>
-                      </Grid>
-                      </Grid>
-                  </form>
+                <LinkRouter.Link to="/" component={Link} className={classes.Link} style={{ textDecoration: 'none' }}>
+                  Forgot password?
+                </LinkRouter.Link>
+                </Grid>*/}
+                <Grid item>
+                <LinkRouter.Link to="/register" className={classes.Link} style={{ textDecoration: 'none' }}>
+                  No estas registrado? Crear cuenta
+                </LinkRouter.Link>
                 </Grid>
-              </Grid>
+                </Grid>
+            </form>
           </Grid>
-        );
+        </Grid>
+      </Grid>
+    );
     
 }

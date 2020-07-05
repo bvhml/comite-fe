@@ -73,257 +73,208 @@ export const validatorArg = new FormValidator([
 
 let validationResponse =  {};
 let registrado = false;
-export default function Register (props){
+export default function Register ({classes,mobile}){
 
-    const [state,setState] = useState({
-      email:'',
-      password:'',
-      messageDialog:'',
-      showDialog:false,
-    });
-    const [ formState, setFormState ] = useState({
-      email:{value:'',errorMessage:''},
-      password:{value:'',errorMessage:''},
-      nombre:{value:'',errorMessage:''},
-      apellido:{value:'',errorMessage:''}
-    });
-
-    let emailInput = React.createRef();
-        
-    
 
     
+  const { from } = { from: { pathname: "/" } };
+  const [state,setState] = useState({
+    email:'',
+    password:'',
+    messageDialog:'',
+    showDialog:false,
+  });
+  const [ formState, setFormState ] = useState({
+    email:{value:'',errorMessage:''},
+    password:{value:'',errorMessage:''},
+    nombre:{value:'',errorMessage:''},
+    apellido:{value:'',errorMessage:''}
+  });
+  let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
+  
+  useEffect(() =>{
+    if (!Auth.loggedIn()){
+      Auth.logout();
+    }
+  },[Auth]);
 
-    let Auth = new AuthHelperMethods();
+  function handleSubmit(event){
+
+    event.preventDefault();
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+    const nombre = event.target.nombre.value;
+    const apellido = event.target.apellido.value;
+
+    setState(state => ({
+      ...state,
+      email:email,
+      password:password,
+      nombre:nombre,
+      apellido:apellido,
+    }));
+
+    const validation = validatorArg.validate({email: email,password: password,nombre: nombre,apellido: apellido});
+    setFormState({email:{value:email,errorMessage:validation.email.message},password:{value:password,errorMessage:validation.password.message},nombre:{value:nombre,errorMessage:validation.nombre.message},apellido:{value:apellido,errorMessage:validation.apellido.message}});
+    validationResponse = {email: validation.email.isInvalid,password:validation.password.isInvalid,nombre:validation.nombre.isInvalid,apellido:validation.apellido.isInvalid}
     
-    useEffect(() =>{
-      let Authenticate = new AuthHelperMethods();
+    
 
-      
-      if (Authenticate.loggedIn()){
-        //this.props.history.replace('/');
-        //console.log("Ya inicie sesion");
-       
-      }
-      else{
-        Authenticate.logout();
-      }
-    },[]);
-
-    function handleSubmit(event){
-
-        const email = event.target.email.value;
-        const password = event.target.password.value;
-        const nombre = event.target.nombre.value;
-        const apellido = event.target.apellido.value;
-
-        setState(state => ({
-          ...state,
-          email:email,
-          password:password,
-          nombre:nombre,
-          apellido:apellido,
-        }));
-
-      const validation = validatorArg.validate({email: email,password: password,nombre: nombre,apellido: apellido});
-      setFormState({email:{value:email,errorMessage:validation.email.message},password:{value:password,errorMessage:validation.password.message},nombre:{value:nombre,errorMessage:validation.nombre.message},apellido:{value:apellido,errorMessage:validation.apellido.message}});
-      validationResponse = {email: validation.email.isInvalid,password:validation.password.isInvalid,nombre:validation.nombre.isInvalid,apellido:validation.apellido.isInvalid}
-      
-     
-
-      if (validation.isValid) {
-        //console.log("TODO BIEN");
-          
-        Auth.signUp(email, password,nombre,apellido)
-          .then(res => {
-            if (res.status === 400) {
-              setState(state => ({
-                ...state,
-                messageDialog:res.err,
-                showDialog:true,
-              }));
-              
-            }
-            else if (res.status === 200){
-              setState(state => ({
-                ...state,
-                messageDialog:"Creado con exito",
-                showDialog:true,
-              }));
-            }
-          })
-          .catch(err => {
+    if (validation.isValid) {
+      Auth.signUp(email, password,nombre,apellido)
+        .then(res => {
+          if (res.status === 400) {
             setState(state => ({
               ...state,
-              messageDialog:"Ha ocurrido un error, intenta mas tarde",
+              messageDialog:res.err,
               showDialog:true,
             }));
-            //alert(err);
-          });
+            
+          }
+          else if (res.status === 200){
+            setState(state => ({
+              ...state,
+              messageDialog:"Creado con exito",
+              showDialog:true,
+            }));
+          }
+        })
+        .catch(err => {
+          setState(state => ({
+            ...state,
+            messageDialog:"Ha ocurrido un error, intenta mas tarde",
+            showDialog:true,
+          }));
+        });
+    }
+    return;
 
-          
-
-
-        
-      }
-      else{
-        //if is Invalid
-        if (validationResponse.email) { 
-        }
-        else if (validationResponse.password) {
-          
-        }
-      }
-
-        
-      event.preventDefault();
-      return;
-
-      }
+  }
     
 
-      function handleClose() { 
+  function handleClose() { 
 
-        if (state.messageDialog === 'Creado con exito'){
-          registrado = true;
-          
-        }
-        setState(state => ({
-          ...state,
-          showDialog:false
-        }));
-      }
-
+    if (state.messageDialog === 'Creado con exito'){
+      registrado = true;
       
-        const {classes} = props;
-        
-        let { from } = { from: { pathname: "/" } };
-        if(state.messageDialog !== 'Creado con exito'){
-          registrado = false;
-        }
-        if (registrado) {
-          return <Redirect to={from}/>;
-        }
-        
-        return(
-          <div>
-          <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'}>
-          <CssBaseline />
-            <Grid item xs={12} sm={7} md={5} component={Paper} elevation={7} square >
-              <div className={classes.paper} spacing={1}>
-              <Avatar className={classes.avatar}>
-                  <Help/>
-              </Avatar>
-              <Typography component="h1" variant="h5">
-                Register
-              </Typography>
-             
-            
-              <form className={classes.form} onSubmit={handleSubmit} noValidate>
-                    <Grid container item spacing={1}>
-                        <Grid item md xs>
-                            <TextField
-                            variant="outlined"
-                            margin="dense"
-                            required
-                            fullWidth
-                            id="nombre"
-                            label="Nombres"
-                            name="nombre"
-                            autoComplete="Nombres"
-                            autoFocus
-                            error={validationResponse.nombre}
-                            helperText={formState.nombre.errorMessage}
-                            inputRef={emailInput}
-                            />
-                        </Grid>
-                        <Grid item md xs>
-                            <TextField
-                            variant="outlined"
-                            margin="dense"
-                            required
-                            fullWidth
-                            id="apellido"
-                            label="Apellidos"
-                            name="apellido"
-                            autoComplete="Apellidos"
-                            error={validationResponse.apellido}
-                            helperText={formState.apellido.errorMessage}
-                            inputRef={emailInput}
-                            />
-                        </Grid>
-                    </Grid>
-                    <TextField
-                    variant="outlined"
-                    margin="dense"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Usuario"
-                    name="email"
-                    autoComplete="email"
-                    error={validationResponse.email}
-                    helperText={formState.email.errorMessage}
-                    inputRef={emailInput}
-                    />
-                    <TextField
-                    variant="outlined"
-                    margin="dense"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Contraseña"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                    error={validationResponse.password}
-                    helperText={formState.password.errorMessage}
-                    />
-                    <Dialog
-                      open={state.showDialog}
-                      onClose={handleClose}
-                      TransitionComponent={Transition}
-                      aria-labelledby="alert-dialog-title"
-                      aria-describedby="alert-dialog-description"
-                    >
-                      <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
-                      <DialogContent className={classes.dialogContent} >
-                      <Avatar  className={classes.bigAvatar} >
-                      <Info className={classes.icon} />
-                      </Avatar>
-                        <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
-                          {state.messageDialog}
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleClose} autoFocus>
-                          Dismiss
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      color="primary"
-                      className={classes.submit}
-                      >
-                      Sign Up
-                    </Button>
-                    <Grid container>
-                    <Grid item lg>
-                    <LinkRouter.Link to="/" component={Link} className={classes.Link} style={{ textDecoration: 'none' }}>
-                      Already have an account? Sign In
-                    </LinkRouter.Link>
-                    </Grid>
-                    </Grid>
-                </form>
-              </div>
-            </Grid>
-            </Grid>
-            </div>
+    }
+    setState(state => ({
+      ...state,
+      showDialog:false
+    }));
+  }
 
-            
-        );
+  if(state.messageDialog !== 'Creado con exito'){
+    registrado = false;
+  }
+  if (registrado) {
+    return <Redirect to={from}/>;
+  }
+        
+  return(
+    <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'6vh'}}>
+    <CssBaseline />
+      <Grid container item xs={12} md={7} lg={5} component={Paper} elevation={7} square justify={'center'}>
+        <Grid container item className={classes.paper} spacing={1} justify={'center'}>
+        <Avatar className={classes.avatar}>
+          <Help/>
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Crear Cuenta
+        </Typography>
+        <form className={classes.form} onSubmit={handleSubmit} noValidate>
+              <TextField
+              variant="outlined"
+              margin="dense"
+              required
+              fullWidth
+              id="nombre"
+              label="Nombres"
+              name="nombre"
+              autoComplete="Nombres"
+              autoFocus
+              error={validationResponse.nombre}
+              helperText={formState.nombre.errorMessage}
+              />
+              <TextField
+              variant="outlined"
+              margin="dense"
+              required
+              fullWidth
+              id="apellido"
+              label="Apellidos"
+              name="apellido"
+              autoComplete="Apellidos"
+              error={validationResponse.apellido}
+              helperText={formState.apellido.errorMessage}
+              />
+              <TextField
+              variant="outlined"
+              margin="dense"
+              required
+              fullWidth
+              id="email"
+              label="Usuario"
+              name="email"
+              autoComplete="email"
+              error={validationResponse.email}
+              helperText={formState.email.errorMessage}
+              />
+              <TextField
+              variant="outlined"
+              margin="dense"
+              required
+              fullWidth
+              name="password"
+              label="Contraseña"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              error={validationResponse.password}
+              helperText={formState.password.errorMessage}
+              />
+              <Dialog
+                open={state.showDialog}
+                onClose={handleClose}
+                TransitionComponent={Transition}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
+                <DialogContent className={classes.dialogContent} >
+                <Avatar  className={classes.bigAvatar} >
+                <Info className={classes.icon} />
+                </Avatar>
+                  <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
+                    {state.messageDialog}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose} autoFocus>
+                    Cerrar
+                  </Button>
+                </DialogActions>
+              </Dialog>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+                >
+                Crear
+              </Button>
+              <Grid container>
+                <Grid item lg>
+                <LinkRouter.Link to="/" component={Link} className={classes.Link} style={{ textDecoration: 'none' }}>
+                  Ya tienes cuenta? Inicia sesion
+                </LinkRouter.Link>
+                </Grid>
+              </Grid>
+          </form>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
     
 }

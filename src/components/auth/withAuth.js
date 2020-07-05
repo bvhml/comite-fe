@@ -3,7 +3,7 @@ import AuthHelperMethods from "./AuthHelperMethods";
 
 /* A higher order component is frequently written as a function that returns a class. */
 export default function withAuth(AuthComponent) {
-  const Auth = new AuthHelperMethods();
+  const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
 
   return class AuthWrapped extends Component {
     state = {

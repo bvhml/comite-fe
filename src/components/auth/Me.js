@@ -46,11 +46,11 @@ export const validatorArg = new FormValidator([
    
 
     
-    let Auth = new AuthHelperMethods();
+    let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
     
     
     useEffect(() =>{
-      let Authenticate = new AuthHelperMethods();
+      let Authenticate = new AuthHelperMethods(process.env.REACT_APP_EP);
       if (Authenticate.loggedIn()){
         //this.props.history.replace('/');
         //console.log("Ya inicie sesion ME");
