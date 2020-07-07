@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -20,6 +19,7 @@ import Paper from '@material-ui/core/Paper';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import * as LinkRouter from "react-router-dom";
 import { Redirect } from "react-router-dom";
+import PropTypes from 'prop-types';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -73,10 +73,8 @@ export const validatorArg = new FormValidator([
 
 let validationResponse =  {};
 let registrado = false;
-export default function Register ({classes,mobile}){
+const Register = ({classes,mobile}) =>{
 
-
-    
   const { from } = { from: { pathname: "/" } };
   const [state,setState] = useState({
     email:'',
@@ -266,7 +264,7 @@ export default function Register ({classes,mobile}){
               </Button>
               <Grid container>
                 <Grid item lg>
-                <LinkRouter.Link to="/" component={Link} className={classes.Link} style={{ textDecoration: 'none' }}>
+                <LinkRouter.Link to="/" className={classes.Link} style={{ textDecoration: 'none' }}>
                   Ya tienes cuenta? Inicia sesion
                 </LinkRouter.Link>
                 </Grid>
@@ -278,3 +276,10 @@ export default function Register ({classes,mobile}){
   );
     
 }
+
+Register.propTypes= {
+  classes: PropTypes.object,
+  mobile: PropTypes.bool,
+};
+
+export default Register;

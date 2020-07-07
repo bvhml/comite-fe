@@ -18,6 +18,7 @@ import {Redirect} from "react-router-dom";
 import AuthHelperMethods from '../../helpers/AuthHelperMethods';
 import Paper from '@material-ui/core/Paper';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import PropTypes from 'prop-types';
 
 const validatorArg = new FormValidator([
   {
@@ -37,7 +38,7 @@ const validatorArg = new FormValidator([
 
 let validationResponse =  {};
 
-export default function SignInForm ({classes, mobile}) {
+const SignInForm =  ({classes, mobile}) => {
 
 
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
@@ -195,3 +196,10 @@ export default function SignInForm ({classes, mobile}) {
     );
     
 }
+
+SignInForm.propTypes= {
+  classes: PropTypes.object,
+  mobile: PropTypes.bool,
+};
+
+export default SignInForm;
