@@ -167,14 +167,6 @@ export default function App (props) {
   const classes = useStyles();
   let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
 
- 
-
-
-
-  function SignInFormRoute(){
-    return <SignInForm classes={classes}/>
-  }  
-
   function ProtectedRoute(){
     return <Me classes={classes}/>
   }  
@@ -201,7 +193,7 @@ export default function App (props) {
     return (
       <ThemeProvider theme={theme}>
         <Router>
-          <Route path="/" exact component={SignInFormRoute}>
+          <Route path="/" exact>
             <SignInForm classes={classes} mobile={mobile}/>
           </Route>
           <PrivateRoute path="/me" component={ProtectedRoute} />
