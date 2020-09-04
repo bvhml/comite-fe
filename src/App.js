@@ -1,28 +1,23 @@
-import React,{useState} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import blue from '@material-ui/core/colors/blue';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import SignInForm from './components/auth/SignInForm';
-import ForgotPassword from './components/auth/ForgotPassword';
 import Me from './components/auth/Me';
-import Register from './components/auth/Register';
 import AuthHelperMethods from './helpers/AuthHelperMethods';
-import DarkTheme from './DarkTheme';
 import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 let theme = PirateTheme;
-let themeName = 'Dark';
 
 
 
 
 export default function App (props) {
 
-
-
+  
   const mobile = useMediaQuery('(min-width:600px)');
   
   let useStyles = makeStyles(theme => ({
@@ -42,10 +37,11 @@ export default function App (props) {
       alignItems: 'center',
     },
     image: {
-      backgroundImage: 'url(https://source.unsplash.com/random)',
+      //backgroundImage: 'url(https://source.unsplash.com/random)',
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      background:'linear-gradient(90deg, rgba(0,145,212,1) 0%, rgba(1,126,211,1) 35%, rgba(1,102,212,1) 100%);'
     },
     paper: {
       margin: theme.spacing(8, 1), //8,1
@@ -78,12 +74,15 @@ export default function App (props) {
       height: 100,
     },
     form: {
-      width: '70%', // Fix IE 11 issue.
+      width: '100%', // Fix IE 11 issue.
       //marginTop: theme.spacing(1),
       
     },
     submit: {
       margin: theme.spacing(3, 0, 2),
+      background:'linear-gradient(90deg, rgba(0,145,212,1) 0%, rgba(1,126,211,1) 35%, rgba(1,102,212,1) 100%);', 
+      color:'white', 
+      textTransform:'none'
     },
     palette: {
       primary: blue,
@@ -150,44 +149,34 @@ export default function App (props) {
     iconButton: {
       padding: 10,
     },
+    cssOutlinedInput: {
+      '&$cssFocused $notchedOutline': {
+        borderColor: 'white',
+      }
+    },
+    cssFocused: {},
+    notchedOutline: {
+      borderWidth: '0px',
+      borderColor: '#eaf6fb !important'
+    },
+    inputLogin:{
+      backgroundColor:'#eaf6fb'
+    }
   }));
+  
   const classes = useStyles();
   let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
 
-  const [tema, setTema] = useState({
-    checkedA: false,
-    checkedB: true,
-  });
-
-  const handleChange = name => event => {
-    
-    console.log(event.target.checked);
-    setTema({ ...tema, [name]: event.target.checked});
-    if (event.target.checked) {
-      themeName = 'Dark';
-      theme = DarkTheme;
-    }
-    else{
-      themeName = 'Light';
-      theme = PirateTheme;
-    }
-    return;
-    };
  
 
-  //const [greeting, setGreeting] = React.useState('Hello World');
 
 
   function SignInFormRoute(){
-    return <SignInForm handleChange={handleChange} classes={classes} themeName={themeName} checkedB={tema.checkedB}/>
+    return <SignInForm classes={classes}/>
   }  
 
-  // eslint-disable-next-line
-  function ForgotPasswordRoute(){
-    return <ForgotPassword classes={classes} />
-  }  
   function ProtectedRoute(){
-    return <Me handleChange={handleChange} classes={classes} themeName={themeName} checkedB={tema.checkedB}/>
+    return <Me classes={classes}/>
   }  
 
   
@@ -213,10 +202,7 @@ export default function App (props) {
       <ThemeProvider theme={theme}>
         <Router>
           <Route path="/" exact component={SignInFormRoute}>
-            <SignInForm handleChange={handleChange} classes={classes} themeName={themeName} checkedB={tema.checkedB} mobile={mobile}/>
-          </Route>
-          <Route path="/register" exact>
-            <Register handleChange={handleChange} classes={classes} themeName={themeName} checkedB={tema.checkedB} mobile={mobile}/>
+            <SignInForm classes={classes} mobile={mobile}/>
           </Route>
           <PrivateRoute path="/me" component={ProtectedRoute} />
         </Router>
