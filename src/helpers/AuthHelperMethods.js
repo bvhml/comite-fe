@@ -25,7 +25,7 @@ export default class AuthHelperMethods {
 
     }
 
-    signUp = (username,password,nombre,apellido) => {
+    signUp = (username,password,nombre,apellido,rol) => {
       // Get a token from api server using the fetch api
       var config = {};
       if (this.loggedIn()) {
@@ -39,6 +39,7 @@ export default class AuthHelperMethods {
           password,
           nombre,
           apellido,
+          rol,
         },config)
         .then(this._checkStatus)
         .then(response => {
@@ -47,6 +48,27 @@ export default class AuthHelperMethods {
         });
   
       }
+
+      resetPassword = (username,password) => {
+        // Get a token from api server using the fetch api
+        var config = {};
+        console.log(this.loggedIn());
+        if (this.loggedIn()) {
+            config = {
+                headers: { Authorization: "bearer " + this.getToken() }
+              };
+        }
+    
+        return axios.post(`http://${this.domain}/usuarios/resetpassword`, {
+            username: username,
+            password: password,
+          },config)
+          .then(response => {
+            //this.login(username,password)
+            return response.data;
+          });
+    
+        }
 
       validateMe = () => {
         // Get a token from api server using the fetch api

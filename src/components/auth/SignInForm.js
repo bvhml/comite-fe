@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import FormValidator from './FormValidator'
+import FormValidator from '../../utils/FormValidator'
 import validator from 'validator'
 import Info from '@material-ui/icons/Info'
 import Avatar from '@material-ui/core/Avatar';
@@ -114,7 +114,7 @@ const SignInForm =  ({classes, mobile}) => {
 
 
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-  const { from } = { from: { pathname: "/me" } };
+  const { from } = { from: { pathname: "/inicio" } };
   
   const [state, dispatch] = useReducer(loginReducer, initialState);
   const { username, password, isLoading, error, showError } = state;
@@ -141,6 +141,7 @@ const SignInForm =  ({classes, mobile}) => {
           }
           else if (res.data.status === 200){
             dispatch({ type: 'success' });
+            localStorage.setItem("usuario", res.data.user);
           }
         })
         .catch(err => {

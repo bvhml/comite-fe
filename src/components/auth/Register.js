@@ -8,7 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
-import FormValidator from './FormValidator'
+import FormValidator from '../../utils/FormValidator'
 import validator from 'validator'
 import Info from '@material-ui/icons/Info'
 import Avatar from '@material-ui/core/Avatar';

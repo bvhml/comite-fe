@@ -5,11 +5,13 @@ import blue from '@material-ui/core/colors/blue';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import SignInForm from './components/auth/SignInForm';
-import Me from './components/auth/Me';
 import AuthHelperMethods from './helpers/AuthHelperMethods';
 import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Register from './components/auth/Register';
+import { Inicio } from './components/inicio';
+import { DrawerUsuarios } from './components/usuarios';
+import { ToastProvider } from 'react-toast-notifications';
 
 let theme = PirateTheme;
 
@@ -169,7 +171,10 @@ export default function App (props) {
   let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
 
   function ProtectedRoute(){
-    return <Me classes={classes}/>
+    return <Inicio classes={classes} mobile={mobile}/>
+  }  
+  function ProtectedRouteUsuarios(){
+    return <DrawerUsuarios classes={classes} mobile={mobile}/>
   }  
 
   
@@ -193,15 +198,18 @@ export default function App (props) {
   }
     return (
       <ThemeProvider theme={theme}>
-        <Router>
-          <Route path="/" exact>
-            <SignInForm classes={classes} mobile={mobile}/>
-          </Route>
-          <Route path="/registrarse" exact>
-            <Register classes={classes} mobile={mobile}/>
-          </Route>
-          <PrivateRoute path="/me" component={ProtectedRoute} />
-        </Router>
+        <ToastProvider placement={'bottom-center'}>
+          <Router>
+            <Route path="/" exact>
+              <SignInForm classes={classes} mobile={mobile}/>
+            </Route>
+            <Route path="/registrarse" exact>
+              <Register classes={classes} mobile={mobile}/>
+            </Route>
+            <PrivateRoute path="/inicio" component={ProtectedRoute} />
+            <PrivateRoute path="/usuarios" component={ProtectedRouteUsuarios} />
+          </Router>
+        </ToastProvider>
       </ThemeProvider>
     );
 }
