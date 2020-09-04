@@ -239,7 +239,7 @@ const SignInForm =  ({classes, mobile}) => {
                 })}
                 />
                 <Grid container item justify='flex-end' style={{fontSize:'12px'}}>
-                <LinkRouter.Link to="/register" className={classes.Link} style={{ textDecoration: 'none' }}>
+                <LinkRouter.Link to="/" className={classes.Link} style={{ textDecoration: 'none' }}>
                   Olvide mi contraseña
                 </LinkRouter.Link>
                 </Grid>  

@@ -16,7 +16,7 @@ export default class AuthHelperMethods {
           };
     }
 
-    return axios.post(`http://${this.domain}/users/login`, {
+    return axios.post(`http://${this.domain}/usuarios/login`, {
         email: username,
         password: password
       },config)
@@ -34,11 +34,11 @@ export default class AuthHelperMethods {
             };
       }
   
-      return axios.post(`http://${this.domain}/users/register`, {
-          email: username,
-          password: password,
-          nombre:nombre,
-          apellido:apellido,
+      return axios.post(`http://${this.domain}/usuarios/register`, {
+          username,
+          password,
+          nombre,
+          apellido,
         },config)
         .then(this._checkStatus)
         .then(response => {

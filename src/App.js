@@ -9,6 +9,7 @@ import Me from './components/auth/Me';
 import AuthHelperMethods from './helpers/AuthHelperMethods';
 import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Register from './components/auth/Register';
 
 let theme = PirateTheme;
 
@@ -195,6 +196,9 @@ export default function App (props) {
         <Router>
           <Route path="/" exact>
             <SignInForm classes={classes} mobile={mobile}/>
+          </Route>
+          <Route path="/registrarse" exact>
+            <Register classes={classes} mobile={mobile}/>
           </Route>
           <PrivateRoute path="/me" component={ProtectedRoute} />
         </Router>
