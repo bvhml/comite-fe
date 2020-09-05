@@ -53,7 +53,7 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         setUsuario(response);
         if (response) {
           if (Number(response.inicio_sesion) === 0) {
-            history.push('/resetmypassword');
+            history.push('/reiniciar-contraseña');
           }
         } 
       } catch (error) {
@@ -89,7 +89,7 @@ export default function PersistentDrawerLeft({classes, mobile}) {
                 >
                     <MenuIcon />
                 </IconButton>
-                <Typography variant={!mobile ? "caption":"h6"} noWrap style={{color:'white'}}>
+                <Typography variant={!mobile ? "caption":"h6"} noWrap style={{color:'white', textTransform:'none'}}>
                       Benemérito Comité Pro-Ciegos y Sordos de Guatemala
                 </Typography>
 
@@ -128,14 +128,14 @@ export default function PersistentDrawerLeft({classes, mobile}) {
           </ListItem>}
 
           {usuario &&
-            ((usuario.rol === 2 || usuario.rol === 3 ) &&
+            ((usuario.rol === 2 || usuario.rol === 3 || true ) &&
           <ListItem button key={'Vehiculos'} onClick={()=>{history.push('/vehiculos')}}>
             <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
           </ListItem>)}
           
 
-          <ListItem button key={'Cambiar mi contraseña'} onClick={()=>{history.push('/resetmypassword')}}>
+          <ListItem button key={'Cambiar mi contraseña'} onClick={()=>{history.push('/reiniciar-contraseña')}}>
             <ListItemIcon>{<VpnKeyIcon onClick={()=>{history.push('/programa')}}/>}</ListItemIcon>
             <ListItemText primary={'Cambiar mi contraseña'}/>
           </ListItem>

@@ -41,7 +41,6 @@ export default class AuthHelperMethods {
           apellido,
           rol,
         },config)
-        .then(this._checkStatus)
         .then(response => {
           //this.login(username,password)
           return response.data;
@@ -69,6 +68,27 @@ export default class AuthHelperMethods {
           });
     
         }
+
+        resetMyPassword = (username,password) => {
+          // Get a token from api server using the fetch api
+          var config = {};
+          console.log(this.loggedIn());
+          if (this.loggedIn()) {
+              config = {
+                  headers: { Authorization: "bearer " + this.getToken() }
+                };
+          }
+      
+          return axios.post(`http://${this.domain}/usuarios/resetmypassword`, {
+              username: username,
+              password: password,
+            },config)
+            .then(response => {
+              //this.login(username,password)
+              return response.data;
+            });
+      
+          }
 
       validateMe = () => {
         // Get a token from api server using the fetch api

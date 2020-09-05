@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -20,12 +20,11 @@ import AuthHelperMethods from '../../helpers/AuthHelperMethods';
 import UserHelperMethods from '../../helpers/UserHelperMethods';
 import { useHistory } from 'react-router-dom';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-import CommuteIcon from '@material-ui/icons/Commute';
 import axios from 'axios';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
-import { Dashboard } from '.';
-
+import { useState } from 'react';
+import { Vehiculos } from '.';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 
 export default function PersistentDrawerLeft({classes, mobile}) {
   const theme = useTheme();
@@ -52,7 +51,7 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         const response = await UserHelperMethodsInstance.buscarUsuario(localStorage.getItem('usuario'),signal.token)
         setUsuario(response);
         if (response) {
-          if ((Number(response.inicio_sesion) === 0) && false) {
+          if (Number(response.inicio_sesion) === 0) {
             history.push('/reiniciar-contraseña');
           }
         } 
@@ -122,18 +121,10 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         <Divider />
         <List>
         {(history.location.pathname !== '/inicio') &&
-          <ListItem button key={'Inicio'} onClick={()=>{handleDrawerClose()}}>
+          <ListItem button key={'Inicio'} onClick={()=>{history.push('/inicio')}}>
             <ListItemIcon>{<DashboardIcon onClick={()=>{history.push('/inicio')}}/>}</ListItemIcon>
             <ListItemText primary={'Inicio'}/>
           </ListItem>}
-
-          {usuario ? 
-            ((usuario.rol === 2 || usuario.rol === 3 || true)? 
-          <ListItem button key={'Vehiculos'} onClick={()=>{history.push('/vehiculos')}}>
-            <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/vehiculos')}}/>}</ListItemIcon>
-            <ListItemText primary={'Vehiculos'}/>
-          </ListItem>:null):null}
-          
 
           {usuario &&
           ((usuario.rol === 3 || true) &&
@@ -142,7 +133,7 @@ export default function PersistentDrawerLeft({classes, mobile}) {
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
           )}
-
+          
           <ListItem button key={'Cambiar mi contraseña'} onClick={()=>{history.push('/reiniciar-contraseña')}}>
             <ListItemIcon>{<VpnKeyIcon onClick={()=>{history.push('/programa')}}/>}</ListItemIcon>
             <ListItemText primary={'Cambiar mi contraseña'}/>
@@ -156,9 +147,9 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         })}
       >
         <div className={classes.drawerHeader} />
-        <Grid container component="main" className={classes.root} style={{backgroundColor:'transparent', padding:!mobile? '0vh':'15vh 0vh', height:"auto", minHeight:'100vh'}}>
+        <Grid container component="main" className={classes.root} style={{backgroundColor:'transparent', padding:!mobile? '0vh':'15vh 0vh', height:"auto"}}>
             <CssBaseline />
-            <Dashboard classes={classes} mobile={mobile}/>
+            <Vehiculos classes={classes} mobile={mobile}/>
         </Grid>
       </main>
     </div>

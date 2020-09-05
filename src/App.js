@@ -10,8 +10,9 @@ import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Register from './components/auth/Register';
 import { Inicio } from './components/inicio';
-import { DrawerUsuarios } from './components/usuarios';
+import { DrawerUsuarios, ResetMyPassword } from './components/usuarios';
 import { ToastProvider } from 'react-toast-notifications';
+import { DrawerVehiculos } from './components/vehiculos';
 
 let theme = PirateTheme;
 
@@ -176,6 +177,12 @@ export default function App (props) {
   function ProtectedRouteUsuarios(){
     return <DrawerUsuarios classes={classes} mobile={mobile}/>
   }  
+  function ProtectedRouteReiniciarContraseña(){
+    return <ResetMyPassword classes={classes} mobile={mobile}/>
+  }  
+  function ProtectedRouteVehiculos(){
+    return <DrawerVehiculos classes={classes} mobile={mobile}/>
+  }  
 
   
   function PrivateRoute({ component: Component, ...rest }) {
@@ -206,8 +213,10 @@ export default function App (props) {
             <Route path="/registrarse" exact>
               <Register classes={classes} mobile={mobile}/>
             </Route>
-            <PrivateRoute path="/inicio" component={ProtectedRoute} />
-            <PrivateRoute path="/usuarios" component={ProtectedRouteUsuarios} />
+            <PrivateRoute path="/inicio" component={ProtectedRoute}/>
+            <PrivateRoute path="/usuarios" component={ProtectedRouteUsuarios}/>
+            <PrivateRoute path="/vehiculos" component={ProtectedRouteVehiculos}/>
+            <PrivateRoute path="/reiniciar-contraseña" component={ProtectedRouteReiniciarContraseña}/>
           </Router>
         </ToastProvider>
       </ThemeProvider>

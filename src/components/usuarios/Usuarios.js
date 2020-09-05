@@ -154,6 +154,12 @@ const Usuarios = ({classes,mobile}) =>{
 
     const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
     if (validation.isValid) {
+      event.target.username.value = '';
+      event.target.password.value = '';
+      event.target.nombre.value = '';
+      event.target.apellido.value = '';
+      event.target.rol.value = '';
+
       Auth.signUp(username, password,nombre,apellido,rol)
         .then(res => {
           if (res.status === 400) {
@@ -198,6 +204,8 @@ const Usuarios = ({classes,mobile}) =>{
     
     const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
     if (validation.isValid) {
+      event.target.username2.value = '';
+      event.target.password2.value = '';
       Auth.resetPassword(username2, password2)
         .then(res => {
           if (res.status === 400) {
@@ -239,9 +247,12 @@ const Usuarios = ({classes,mobile}) =>{
   return(
       <Grid container item xs={12} md={12} component={Paper} elevation={5} square spacing={2} style={{backgroundColor:'transparent', padding:'10vh'}} justify={'center'} alignContent='center'>
         <Grid container item className={classes.paper} spacing={1} justify={'center'}>
-        <Typography component="h1" variant="h5">
+          <Grid item container>
+          <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
           Crear usuario
         </Typography>
+          </Grid>
+        
         <form className={classes.form} onSubmit={handleSubmit} noValidate autoComplete='off'>
           <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -313,9 +324,10 @@ const Usuarios = ({classes,mobile}) =>{
                   //onChange={event => {inputs.rol = event.target.value; setRender(!render)}}
                   >
                   <option aria-label="None" value="" />
-                  <option value={'1'}>Piloto</option>
-                  <option value={'2'}>Trabajador Social</option>
-                  <option value={'3'}>Director</option>
+                  <option value={'1'}>Director</option>
+                  <option value={'2'}>Administrador de estación</option>
+                  <option value={'3'}>Trabajador Social</option>
+                  <option value={'4'}>Piloto</option>
                   </Select>
                   { validationResponse.rol && <FormHelperText>Seleccione un rol</FormHelperText>}
               </FormControl>  
@@ -371,9 +383,11 @@ const Usuarios = ({classes,mobile}) =>{
         </Grid>
 
         <Grid container item className={classes.paper} spacing={1} justify={'center'}>
-        <Typography component="h1" variant="h5">
-          Reiniciar contraseña
-        </Typography>
+        <Grid item container>
+          <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
+            Reiniciar contraseña
+          </Typography>
+        </Grid>
         <form className={classes.form} onSubmit={handleSubmitContraseña} noValidate autoComplete='off'>
           <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
