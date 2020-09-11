@@ -103,7 +103,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
             <ListItemText primary={'Cambiar mi contraseña'}/>
           </ListItem>
         </List>
-        <div className="cerrar-sesion" onClick={()=>{Auth.logout()}}>
+        <div className="cerrar-sesion" onClick={()=>{Auth.logout(); history.push('/')}}>
           <ExitToAppIcon />
           <span>Cerrar sesión</span>       
         </div>
