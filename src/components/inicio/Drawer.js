@@ -15,33 +15,30 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Grid, Button } from '@material-ui/core';
+import { Grid, Button, FormHelperText } from '@material-ui/core';
 import AuthHelperMethods from '../../helpers/AuthHelperMethods';
 import UserHelperMethods from '../../helpers/UserHelperMethods';
-import { useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, useHistory, useParams } from 'react-router-dom';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
 import CommuteIcon from '@material-ui/icons/Commute';
 import axios from 'axios';
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+
 import { Dashboard } from '.';
+import { Usuarios } from '../usuarios/index';
+
+import './inicio.css'
 
 
-export default function PersistentDrawerLeft({classes, mobile}) {
+export default function PersistentDrawerLeft({ classes, mobile }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const open = true;
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);  
   const [ usuario, setUsuario ] = useState(null);
   const history = useHistory();
-  
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  let params = useParams();
 
   
   useEffect(()=>{
@@ -69,44 +66,8 @@ export default function PersistentDrawerLeft({classes, mobile}) {
   
 
   return (
-    <div className={classes.root} style={{backgroundColor:'transparent', padding:'0vh 0vh 0vh 2.5vh'}}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
-      >
-        <Toolbar style={{backgroundColor:'#db1f26'}}>
-            <Grid container justify={'space-between'} alignItems={'baseline'}>
-                <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={handleDrawerOpen}
-                    edge="start"
-                    className={clsx(classes.menuButton, open && classes.hide)}
-                    style={{color:'white'}}
-                >
-                    <MenuIcon />
-                </IconButton>
-                <Typography variant={!mobile ? "caption":"h6"} noWrap style={{color:'white', textTransform:'none'}}>
-                      Benemérito Comité Pro-Ciegos y Sordos de Guatemala
-                </Typography>
-
-                <Button
-                onClick={()=>{Auth.logout(); history.push('/');}}
-                variant="contained"
-                color={"primary"}
-                className={classes.submit}
-                style={{backgroundColor:"#ee2e24", fontSize:!mobile ? "10px":""}}
-                >
-                Cerrar sesion
-                </Button>
-            </Grid>
-        </Toolbar>
-      </AppBar>
+    <div className="menu-principal">
       <Drawer
-        className={classes.drawer}
         variant="persistent"
         anchor="left"
         open={open}
@@ -115,30 +76,24 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         }}
       >
         <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
+          <div className="menu-principal__logo">
+            <img src="/logo.png" alt="logo" style={{width:'200px'}}/>
+          </div>          
         </div>
-        <Divider />
         <List>
-        {(history.location.pathname !== '/inicio') &&
-          <ListItem button key={'Inicio'} onClick={()=>{handleDrawerClose()}}>
-            <ListItemIcon>{<DashboardIcon onClick={()=>{history.push('/inicio')}}/>}</ListItemIcon>
-            <ListItemText primary={'Inicio'}/>
-          </ListItem>}
 
           {usuario ? 
             ((usuario.rol === 2 || usuario.rol === 3 || true)? 
-          <ListItem button key={'Vehiculos'} onClick={()=>{history.push('/vehiculos')}}>
-            <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/vehiculos')}}/>}</ListItemIcon>
+          <ListItem button key={'Vehiculos'} onClick={()=>{history.push('/home/vehiculos')}}>
+            <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/home/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
           </ListItem>:null):null}
           
 
           {usuario &&
           ((usuario.rol === 3 || true) &&
-          <ListItem button key={'Usuarios'} onClick={()=>{history.push('/usuarios')}}>
-            <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/usuarios')}}/></ListItemIcon>
+          <ListItem button key={'Usuarios'} onClick={()=>{history.push('/home/usuarios')}}>
+            <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/usuarios')}}/></ListItemIcon>
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
           )}
@@ -148,7 +103,10 @@ export default function PersistentDrawerLeft({classes, mobile}) {
             <ListItemText primary={'Cambiar mi contraseña'}/>
           </ListItem>
         </List>
-        <Divider />
+        <div className="cerrar-sesion" onClick={()=>{Auth.logout()}}>
+          <ExitToAppIcon />
+          <span>Cerrar sesión</span>       
+        </div>
       </Drawer>
       <main
         className={clsx(classes.content, {
@@ -156,11 +114,18 @@ export default function PersistentDrawerLeft({classes, mobile}) {
         })}
       >
         <div className={classes.drawerHeader} />
-        <Grid container component="main" className={classes.root} style={{backgroundColor:'transparent', padding:!mobile? '0vh':'15vh 0vh', height:"auto", minHeight:'100vh'}}>
+        <Grid container component="main" className={classes.root} style={{backgroundColor:'transparent', height:"auto", minHeight:'100vh'}}>
             <CssBaseline />
-            <Dashboard classes={classes} mobile={mobile}/>
+            { getComponent(params.pagina, classes, mobile) }  
         </Grid>
       </main>
     </div>
   );
+}
+
+const getComponent = (pagina, classes, mobile) => {
+  switch(pagina) {
+    case 'vehiculos': return <Dashboard classes={classes} mobile={mobile}/>
+    case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
+  }
 }

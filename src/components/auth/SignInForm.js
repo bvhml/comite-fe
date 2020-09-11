@@ -114,7 +114,7 @@ const SignInForm =  ({classes, mobile}) => {
 
 
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-  const { from } = { from: { pathname: "/inicio" } };
+  const { from } = { from: { pathname: "/home/vehiculos" } };
   
   const [state, dispatch] = useReducer(loginReducer, initialState);
   const { username, password, isLoading, error, showError } = state;

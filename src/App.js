@@ -213,10 +213,7 @@ export default function App (props) {
             <Route path="/registrarse" exact>
               <Register classes={classes} mobile={mobile}/>
             </Route>
-            <PrivateRoute path="/inicio" component={ProtectedRoute}/>
-            <PrivateRoute path="/usuarios" component={ProtectedRouteUsuarios}/>
-            <PrivateRoute path="/vehiculos" component={ProtectedRouteVehiculos}/>
-            <PrivateRoute path="/reiniciar-contraseña" component={ProtectedRouteReiniciarContraseña}/>
+            <PrivateRoute path="/home/:pagina" component={ProtectedRoute}/>
           </Router>
         </ToastProvider>
       </ThemeProvider>

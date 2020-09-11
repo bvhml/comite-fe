@@ -96,13 +96,11 @@ const Dashboard = ({classes,mobile}) =>{
 
         
   return(
-        <Grid container item xs={12} md={12} component={Paper} elevation={5} square spacing={2} style={{backgroundColor:'transparent', padding:'10vh', minHeight:'100vh', height:'auto'}} justify={'center'} alignContent='center'>
-        <Grid item xs={12} md={5} container justify='center'>
-          <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
-            Bienvenido <strong>{localStorage.getItem('usuario')}</strong>, esta pagina esta en desarrollo. Puedes explorar otras paginas en el menu izquierdo.
-          </Typography>
-        </Grid>
-        </Grid>
+    <div className="dashboard">
+      <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
+          Bienvenido <strong>{localStorage.getItem('usuario')}</strong>, esta pagina esta en desarrollo. Puedes explorar otras paginas en el menu izquierdo.
+        </Typography>
+    </div>
   );
     
 }
