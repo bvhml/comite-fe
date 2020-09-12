@@ -45,6 +45,7 @@ export default function App (props) {
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      backgroundImage: 'url(\'/cars-moving.gif\')',
       background:'linear-gradient(90deg, rgba(0,145,212,1) 0%, rgba(1,126,211,1) 35%, rgba(1,102,212,1) 100%);'
     },
     paper: {

@@ -1,0 +1,14 @@
+.vehiculos {
+    padding: 2rem;
+    width: 100%;
+}
+
+.vehiculos__encabezado {
+    width: 100%;
+}
+
+.vehiculos__boton-agregar {
+    background-color: #e04046 !important;
+    color: #ffffff !important;
+    float: right;
+}

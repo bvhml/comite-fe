@@ -28,6 +28,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import { Dashboard } from '.';
 import { Usuarios } from '../usuarios/index';
+import Vehiculos from '../vehiculos/Vehiculos';
 
 import './inicio.css'
 
@@ -77,7 +78,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
       >
         <div className={classes.drawerHeader}>
           <div className="menu-principal__logo">
-            <img src="/logo.png" alt="logo" style={{width:'200px'}}/>
+            <img src="/logo.png" alt="logo" style={{width:'150px'}}/>
           </div>          
         </div>
         <List>
@@ -125,7 +126,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
 
 const getComponent = (pagina, classes, mobile) => {
   switch(pagina) {
-    case 'vehiculos': return <Dashboard classes={classes} mobile={mobile}/>
+    case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
     case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
   }
 }
