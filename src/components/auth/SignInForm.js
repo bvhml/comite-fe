@@ -160,7 +160,7 @@ const SignInForm =  ({classes, mobile}) => {
     return <Redirect to={from}/>;
   }
     return(
-      <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'3vh 12vh', height:'auto'}}>
+      <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'3vh 12vh', height:'auto', minHeight:'100vh'}}>
         <CssBaseline />
         <Grid container item xs={12} md={7} lg={5} component={Paper} elevation={6}>
           <Grid container item className={classes.paper} justify={'center'} spacing={6}>

@@ -8,7 +8,7 @@ export default class UserHelperMethods {
         //THIS LINE IS ONLY USED WHEN YOU'RE IN PRODUCTION MODE!
         this.domain = domain //|| "localhost:80"; // API server domain
     }
-    buscarUsuarios = (myCancelToken) => {
+    buscarUsuarios = (cancelToken) => {
         const Auth = new AuthHelperMethods(this.domain);
 
         const headers = {
@@ -19,11 +19,11 @@ export default class UserHelperMethods {
             headers["Authorization"] = "Bearer " + Auth.getToken();
         }
 
-        return axios.get(`${httpsCall}://${this.domain}/usuarios/`, { headers: headers, cancelToken: myCancelToken })
+        return axios.get(`${httpsCall}://${this.domain}/usuarios/`, { headers, cancelToken })
             .then(this._checkStatus)
             .then(response => response.data);
     }
-    buscarUsuario = (username, myCancelToken) => {
+    buscarUsuario = (username, cancelToken) => {
 
         try {
 
@@ -37,7 +37,7 @@ export default class UserHelperMethods {
             if (Auth.loggedIn()) {
                 headers["Authorization"] = "Bearer " + Auth.getToken();
             }
-            return axios.get(`${httpsCall}://${this.domain}/usuarios/${username}`, { headers: headers, cancelToken: myCancelToken })
+            return axios.get(`${httpsCall}://${this.domain}/usuarios/${username}`, { headers, cancelToken })
                 .then(this._checkStatus)
                 .then(response => response.data);
         } catch (error) {

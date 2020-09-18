@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Button, FormControl, InputLabel, Input } from '@material-ui/core';
 
@@ -9,6 +9,7 @@ const FormularioEntidad = ({ type, fields, onChange, onSubmit }) => {
     const getTitle = () => {
         switch(type) {
             case 'vehiculos': return 'Nuevo vehículo'
+            default: return 'Nuevo vehículo'
         }
     }    
 

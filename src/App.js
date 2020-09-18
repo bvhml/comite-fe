@@ -10,9 +10,7 @@ import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Register from './components/auth/Register';
 import { Inicio } from './components/inicio';
-import { DrawerUsuarios, ResetMyPassword } from './components/usuarios';
 import { ToastProvider } from 'react-toast-notifications';
-import { DrawerVehiculos } from './components/vehiculos';
 
 let theme = PirateTheme;
 
@@ -175,16 +173,6 @@ export default function App (props) {
   function ProtectedRoute(){
     return <Inicio classes={classes} mobile={mobile}/>
   }  
-  function ProtectedRouteUsuarios(){
-    return <DrawerUsuarios classes={classes} mobile={mobile}/>
-  }  
-  function ProtectedRouteReiniciarContraseña(){
-    return <ResetMyPassword classes={classes} mobile={mobile}/>
-  }  
-  function ProtectedRouteVehiculos(){
-    return <DrawerVehiculos classes={classes} mobile={mobile}/>
-  }  
-
   
   function PrivateRoute({ component: Component, ...rest }) {
     return (

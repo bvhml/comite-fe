@@ -1,7 +1,4 @@
-import axios from 'axios'
 import AuthHelperMethods from './AuthHelperMethods';
-
-const httpsCall = process.env.REACT_APP_HTTPS === 'true' ? 'https' : 'http';
 
 export default class VehiculoHelperMethods {
     constructor(domain) {
@@ -19,6 +16,31 @@ export default class VehiculoHelperMethods {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(vehiculo)
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/vehiculos`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+
+    obtenerTodosVehiculos = async (cancelToken) => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                cancelToken
             }
 
             if (Auth.loggedIn()) {
