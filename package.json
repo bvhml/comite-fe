@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "jwt-decode": "^2.2.0",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-backdrop-filter": "^2.1.0",
     "react-dom": "^16.13.1",
@@ -20,7 +21,7 @@
     "validator": "^13.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "set PORT=3001 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
