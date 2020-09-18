@@ -142,27 +142,31 @@ const Vehiculos = ({ classes, mobile }) => {
     message: 'Ingrese un color',
     error: false
   }];
-
+  
   let columns= [
     { 
       title: 'Piloto Asignado', 
       field: 'piloto',
       searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.piloto}</div>
     },
     { 
-      title: 'Marca', 
+      title: 'Vehículo', 
       field: 'marca',
       searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.marca}</div>
     },
     { 
-      title: 'Transmision', 
+      title: 'Transmisión', 
       field: 'transmision',
       searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.transmision}</div>
     },
     { 
       title: 'Placa', 
       field: 'placa',
       searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.placa}</div>
     },
   ];
 
@@ -226,6 +230,7 @@ const Vehiculos = ({ classes, mobile }) => {
   }
 
     return (
+    <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
       <div className="vehiculos">
         <div className="vehiculos__encabezado">
           <Grid container justify='flex-end'>
@@ -246,7 +251,9 @@ const Vehiculos = ({ classes, mobile }) => {
                 searchFieldAlignment:'left',
                 defaultGroupOrder:'0',
                 pageSize: 10,
-                actionsColumnIndex: -1}
+                actionsColumnIndex: -1,
+                rowStyle:{backgroundColor:'whitesmoke',
+                emptyRowsWhenPaging: true,}}
                 }
                 
               localization={{ 
@@ -256,6 +263,9 @@ const Vehiculos = ({ classes, mobile }) => {
                     filterRow: {
                         filterTooltip: 'Filter'
                     }
+                },
+                header:{
+                  actions:''
                 } 
                 }}
 
@@ -290,7 +300,7 @@ const Vehiculos = ({ classes, mobile }) => {
           </Modal>
         </div>
       </div>
-      
+    </Grid>
     );
 }
 
