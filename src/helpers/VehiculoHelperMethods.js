@@ -15,7 +15,7 @@ export default class VehiculoHelperMethods {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(vehiculo)
+                body: JSON.stringify({ vehiculo: vehiculo })
             }
 
             if (Auth.loggedIn()) {

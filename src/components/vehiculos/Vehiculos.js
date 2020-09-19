@@ -222,7 +222,9 @@ const Vehiculos = ({ classes, mobile }) => {
   const enviarVehiculo = async () => {
     try {
       let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
-      console.log(saveResponse);
+      vehiculos.push(vehiculo);
+      setVehiculos(vehiculos);
+      handleClose();
     }
     catch (error) {
       console.log(error);
@@ -234,7 +236,7 @@ const Vehiculos = ({ classes, mobile }) => {
       <div className="vehiculos">
         <div className="vehiculos__encabezado">
           <Grid container justify='flex-end'>
-            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar un vehículo</Button>
+            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar vehículo</Button>
           </Grid>
 
           <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
