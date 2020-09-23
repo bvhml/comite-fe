@@ -51,6 +51,7 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
       case 'field': {
         return {
           ...state,
+          error: false,
           vehiculo: {...state.vehiculo,[action.fieldName]:action.payload},
         };
       }
@@ -78,9 +79,8 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
       case 'error': {
         return {
           ...state,
-          error: 'El usuario y/o contraseña no son válidos',
+          error: true,
           showError: true,
-          isLoggedIn: false,
           isLoading: false,
         };
       }
@@ -102,6 +102,18 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
           open: true,
         };
       }
+      case 'editar': {
+        return {
+          ...state,
+          editar: true,
+        };
+      }
+      case 'noEditar': {
+        return {
+          ...state,
+          editar: false,
+        };
+      }
       default:
         return state;
     }
@@ -111,20 +123,19 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
     vehiculos: [],
     vehiculo: null,
     isLoading: false,
-    error: '',
+    error: false,
     showError: false,
     isLoggedIn: false,
     open: false,
+    editar: false,
   };
 
 const Vehiculos = ({ classes, mobile }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
-  const [formError, setFormError] = useState(false);
-  const [editar, setEditar] = useState(false);
 
   const [state, dispatch] = useReducer(vehiculosReducer, initialState);
-  const { vehiculos, vehiculo, isLoading, open, error, showError } = state;
+  const { vehiculos, vehiculo, isLoading, open, editar, error, showError } = state;
 
   let fields = [{ 
     label: 'Marca',
@@ -268,8 +279,6 @@ const Vehiculos = ({ classes, mobile }) => {
   };
   
   const handleChange = event => {
-    setFormError(false);
-
     dispatch({
       type: 'field',
       fieldName: event.target.id,
@@ -280,15 +289,15 @@ const Vehiculos = ({ classes, mobile }) => {
   const handleSubmit = event => {
       event.preventDefault();
       validateForm();
-      if(!formError){
+      if(!error){
           enviarVehiculo()
       }
   }
 
   const validateForm = () => {
     fields.forEach(field => {
-      if(!formError && !vehiculo[field.field]) {
-        setFormError(true);
+      if(!error && !vehiculo[field.field]) {
+        dispatch({ type: 'error' });
       }
     });
   }
@@ -351,6 +360,7 @@ const Vehiculos = ({ classes, mobile }) => {
                     tooltip: 'Editar vehiculo',
                     onClick: (event, rowData) => {
                       // Do save operation
+                      console.log(rowData)
 
                     }
                   },
