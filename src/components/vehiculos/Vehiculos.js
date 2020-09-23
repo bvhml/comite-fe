@@ -1,9 +1,8 @@
 import React, { useState, useEffect, forwardRef, useReducer } from 'react';
-import { Button, Modal } from '@material-ui/core';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
 import VehiculoHelperMethods from '../../helpers/VehiculoHelperMethods';
-import { Grid, TextField } from '@material-ui/core';
+import { Grid, TextField, Button, Modal } from '@material-ui/core';
 import axios from 'axios';
 import MaterialTable from 'material-table';
 
@@ -315,6 +314,31 @@ const Vehiculos = ({ classes, mobile }) => {
     } 
   }
 
+  const editarVehiculo = async () => {
+    try {
+      const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
+      let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
+      let signal = axios.CancelToken.source();
+      
+      try {
+        dispatch({ type: 'load' });
+        const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
+        if (response) {
+          dispatch({ type: 'vehiculos', payload: response });
+        } 
+      } catch (error) {
+          if (axios.isCancel(error)) {
+            //console.log('Error: ', error.message); // => prints: Api is being canceled
+        }
+      }  
+
+      dispatch({ type: 'noEditar'});
+    }
+    catch (error) {
+      console.log(error);
+    } 
+  }
+
     return (
     <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
       <div className="vehiculos">
@@ -492,6 +516,13 @@ const Vehiculos = ({ classes, mobile }) => {
               style={{paddingLeft:'1rem'}}
               onChange={handleChange}
               />
+
+              <Button onClick={()=> dispatch({type:'noEditar'})} style={{backgroundColor: '#e04046',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
+                Cancelar
+              </Button>
+              <Button onClick={editarVehiculo} style={{backgroundColor: 'green',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
+                Guardar
+              </Button>
             </form>}
           </Grid>
           </Modal>
