@@ -3,7 +3,7 @@ import { Button, Modal } from '@material-ui/core';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
 import VehiculoHelperMethods from '../../helpers/VehiculoHelperMethods';
-import { Grid } from '@material-ui/core';
+import { Grid, TextField } from '@material-ui/core';
 import axios from 'axios';
 import MaterialTable from 'material-table';
 
@@ -279,6 +279,7 @@ const Vehiculos = ({ classes, mobile }) => {
   };
   
   const handleChange = event => {
+    event.preventDefault();
     dispatch({
       type: 'field',
       fieldName: event.target.id,
@@ -360,7 +361,8 @@ const Vehiculos = ({ classes, mobile }) => {
                     tooltip: 'Editar vehiculo',
                     onClick: (event, rowData) => {
                       // Do save operation
-                      console.log(rowData)
+                      dispatch({type: 'editar'})
+                      dispatch({ type: 'vehiculo', payload: rowData });
 
                     }
                   },
@@ -384,7 +386,114 @@ const Vehiculos = ({ classes, mobile }) => {
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
           >
-            <FormularioEntidad type="vehiculos" fields={fields} onChange={handleChange} onSubmit={handleSubmit} />
+           <FormularioEntidad type="vehiculos" fields={fields} onChange={handleChange} onSubmit={handleSubmit} /> 
+          </Modal>
+          <Modal
+            open={editar}
+            onClose={()=> dispatch({ type: 'noEditar'})}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+          <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
+            {vehiculo && <form noValidate autoComplete="off" spacing={2} >
+              <TextField
+              id="marca"
+              label='Marca'
+              value={vehiculo.marca || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="placa"
+              label='Placa'
+              value={vehiculo.placa || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="modelo"
+              label='Modelo'
+              value={vehiculo.modelo || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="linea"
+              label='Linea'
+              value={vehiculo.linea || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="tipo"
+              label='Tipo'
+              value={vehiculo.tipo || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="chasis"
+              label='Chasis'
+              value={vehiculo.chasis || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="tamaño_motor"
+              label='Motor'
+              value={vehiculo.tamaño_motor || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="cant_cilindros"
+              label='Cilindros'
+              value={vehiculo.cant_cilindros || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="toneladas"
+              label='Toneladas'
+              value={vehiculo.toneladas || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="transmision"
+              label='Transmision'
+              value={vehiculo.transmision || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="asientos"
+              label='Numero de asientos'
+              value={vehiculo.asientos || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+              <TextField
+              id="color"
+              label='Color'
+              value={vehiculo.color || ''}
+              variant='standard'
+              style={{paddingLeft:'1rem'}}
+              onChange={handleChange}
+              />
+            </form>}
+          </Grid>
           </Modal>
         </div>
       </div>
