@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef, useReducer } from 'react';
 import { Button, Modal } from '@material-ui/core';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
@@ -26,36 +26,105 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
 
-const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-    DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-    FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-    LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-    ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
-  };
+  const tableIcons = {
+      Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+      Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+      Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+      Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+      DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+      Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+      Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+      Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+      FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+      LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+      NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+      PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+      ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+      Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+      SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+      ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+      ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+    };
 
+  function vehiculosReducer(state, action) {
+    switch (action.type) {
+      case 'field': {
+        return {
+          ...state,
+          vehiculo: {...state.vehiculo,[action.fieldName]:action.payload},
+        };
+      }
+      case 'load': {
+        return {
+          ...state,
+          error: '',
+          isLoading: true,
+        };
+      }
+      case 'vehiculos': {
+        return {
+          ...state,
+          vehiculos: action.payload,
+          isLoading: false,
+        };
+      }
+      case 'vehiculo': {
+        return {
+          ...state,
+          vehiculo: action.payload,
+          isLoading: false,
+        };
+      }
+      case 'error': {
+        return {
+          ...state,
+          error: 'El usuario y/o contraseña no son válidos',
+          showError: true,
+          isLoggedIn: false,
+          isLoading: false,
+        };
+      }
+      case 'logOut': {
+        return {
+          ...state,
+          isLoggedIn: false,
+        };
+      }
+      case 'hideModal': {
+        return {
+          ...state,
+          open: false,
+        };
+      }
+      case 'showModal': {
+        return {
+          ...state,
+          open: true,
+        };
+      }
+      default:
+        return state;
+    }
+  }
+  
+  const initialState = {
+    vehiculos: [],
+    vehiculo: null,
+    isLoading: false,
+    error: '',
+    showError: false,
+    isLoggedIn: false,
+    open: false,
+  };
 
 const Vehiculos = ({ classes, mobile }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
-
-  const [open, setOpen] = useState(false);
-  const [vehiculo, setVehiculo] = useState({});
-  const [vehiculos, setVehiculos] = useState(null);
   const [formError, setFormError] = useState(false);
   const [editar, setEditar] = useState(false);
+
+  const [state, dispatch] = useReducer(vehiculosReducer, initialState);
+  const { vehiculos, vehiculo, isLoading, open, error, showError } = state;
 
   let fields = [{ 
     label: 'Marca',
@@ -175,10 +244,10 @@ const Vehiculos = ({ classes, mobile }) => {
     const getTodosVehiculos = async ()=>{
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
       try {
+        dispatch({ type: 'load' });
         const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
-        setVehiculos(response);
         if (response) {
-
+          dispatch({ type: 'vehiculos', payload: response });
         } 
       } catch (error) {
           if (axios.isCancel(error)) {
@@ -191,16 +260,21 @@ const Vehiculos = ({ classes, mobile }) => {
   },[]);
 
   const handleOpen = () => {
-    setOpen(true);
+    dispatch({ type: 'showModal' });
   };
 
   const handleClose = () => {
-    setOpen(false);
+    dispatch({ type: 'hideModal' });
   };
   
   const handleChange = event => {
     setFormError(false);
-    setVehiculo({ ...vehiculo, [event.target.id]: event.target.value });
+
+    dispatch({
+      type: 'field',
+      fieldName: event.target.id,
+      payload: event.currentTarget.value,
+    });
   }
 
   const handleSubmit = event => {
@@ -223,12 +297,12 @@ const Vehiculos = ({ classes, mobile }) => {
     try {
       let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
       vehiculos.push(vehiculo);
-      setVehiculos(vehiculos);
+      dispatch({ type: 'vehiculos', payload: vehiculos });
       handleClose();
     }
     catch (error) {
       console.log(error);
-    }
+    } 
   }
 
     return (
@@ -241,7 +315,7 @@ const Vehiculos = ({ classes, mobile }) => {
 
           <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
 
-            { vehiculos && <MaterialTable
+            { vehiculos && !isLoading && <MaterialTable
               icons={tableIcons}
               columns={columns}
               data={vehiculos}
@@ -290,6 +364,8 @@ const Vehiculos = ({ classes, mobile }) => {
                 ]}
                 
             />}
+
+            {isLoading && <Grid> Cargando vehiculos ...</Grid>}
           </Grid>
 
           <Modal
