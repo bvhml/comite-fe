@@ -26,7 +26,10 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
   const theme = useTheme();
   const open = true;
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);  
+
   const [ usuario, setUsuario ] = useState(null);
+  const [ navOption, setNavOption] = useState('vehiculos');
+
   const history = useHistory();
   let params = useParams();
 
@@ -53,7 +56,16 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
     return ()=>{signal.cancel('Api is being canceled');}
   },[history]);
   
-  
+  const selectNavOption = (option) => {
+    if(option === 'logout') {
+      Auth.logout(); 
+      history.push('/');
+    }
+    else {
+      history.push(`/home/${option}`);
+      setNavOption(option);
+    }    
+  }
 
   return (
     <div className="menu-principal">
@@ -73,27 +85,27 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         <List>
 
           {usuario ? 
-            ((usuario.rol === 2 || usuario.rol === 3 || true)? 
-          <ListItem button key={'Vehiculos'} onClick={()=>{history.push('/home/vehiculos')}}>
+            ((usuario.rol === 3 || usuario.rol === 4 || true)? 
+          <ListItem button key={'Vehiculos'} selected={navOption === 'vehiculos'} onClick={()=>{selectNavOption('vehiculos')}}>
             <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/home/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
           </ListItem>:null):null}
           
 
           {usuario &&
-          ((usuario.rol === 3 || true) &&
-          <ListItem button key={'Usuarios'} onClick={()=>{history.push('/home/usuarios')}}>
+          ((usuario.rol === 4 || true) &&
+          <ListItem button key={'Usuarios'} selected={navOption === 'usuarios'} onClick={()=>{selectNavOption('usuarios')}}>
             <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/usuarios')}}/></ListItemIcon>
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
           )}
 
-          <ListItem button key={'Cambiar mi contraseña'} onClick={()=>{history.push('/reiniciar-contraseña')}}>
+          <ListItem button key={'Cambiar mi contraseña'} selected={navOption === 'reiniciar-contraseña'} onClick={()=>{selectNavOption('reiniciar-contraseña')}}>
             <ListItemIcon>{<VpnKeyIcon onClick={()=>{history.push('/programa')}}/>}</ListItemIcon>
             <ListItemText primary={'Cambiar mi contraseña'}/>
           </ListItem>
         </List>
-        <div className="cerrar-sesion" onClick={()=>{Auth.logout(); history.push('/')}}>
+        <div className="cerrar-sesion" onClick={()=>{selectNavOption('logout')}}>
           <ExitToAppIcon />
           <span>Cerrar sesión</span>       
         </div>

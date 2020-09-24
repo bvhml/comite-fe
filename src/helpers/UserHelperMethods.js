@@ -8,6 +8,7 @@ export default class UserHelperMethods {
         //THIS LINE IS ONLY USED WHEN YOU'RE IN PRODUCTION MODE!
         this.domain = domain //|| "localhost:80"; // API server domain
     }
+
     buscarUsuarios = (cancelToken) => {
         const Auth = new AuthHelperMethods(this.domain);
 
@@ -23,6 +24,7 @@ export default class UserHelperMethods {
             .then(this._checkStatus)
             .then(response => response.data);
     }
+
     buscarUsuario = (username, cancelToken) => {
 
         try {
@@ -45,4 +47,15 @@ export default class UserHelperMethods {
         }
     }
 
+    guardarUsuario = async usuario => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            const response = await Auth.signUp(usuario);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            return error;
+        }
+    }
 }

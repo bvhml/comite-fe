@@ -25,7 +25,7 @@ export default class AuthHelperMethods {
 
     }
 
-    signUp = (username,password,nombre,apellido,rol) => {
+    signUp = async (usuario) => {
       // Get a token from api server using the fetch api
       var config = {};
       if (this.loggedIn()) {
@@ -34,13 +34,7 @@ export default class AuthHelperMethods {
             };
       }
   
-      return axios.post(`http://${this.domain}/usuarios/register`, {
-          username,
-          password,
-          nombre,
-          apellido,
-          rol,
-        },config)
+      return axios.post(`http://${this.domain}/usuarios/register`, usuario, config)
         .then(response => {
           //this.login(username,password)
           return response.data;

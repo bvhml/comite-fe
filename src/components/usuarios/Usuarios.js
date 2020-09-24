@@ -1,474 +1,463 @@
-import React, { useState, useEffect } from 'react';
-import {TextField, Grid, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, InputLabel, Select, FormHelperText } from '@material-ui/core';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
-import Slide from '@material-ui/core/Slide';
-import FormValidator from '../../utils/FormValidator';
+import React, { useState, useEffect, forwardRef, useReducer } from 'react';
 import validator from 'validator';
-import Info from '@material-ui/icons/Info';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
-import AuthHelperMethods from '../../helpers/AuthHelperMethods';
+import FormularioEntidad from '../forms/FormularioEntidad'
 import UserHelperMethods from '../../helpers/UserHelperMethods';
-import Paper from '@material-ui/core/Paper';
-import PropTypes from 'prop-types';
-import { useToasts } from 'react-toast-notifications';
+import { Grid, TextField, Button, Modal } from '@material-ui/core';
 import axios from 'axios';
+import MaterialTable from 'material-table';
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import './usuarios.scss';
 
-const validatorArg = new FormValidator([
-  {
-    field: 'username',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Nombre de usuario requerido'
-  },
-  { 
-    field: 'username',
-    method: validator.isEmail,
-    validWhen: true,
-    message: 'Ingrese un correo electronico valido'
-  },
-  { 
-    field: 'password',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Contraseña requerida'
-  },
-  { 
-    field: 'nombre',
-    method: validator.isNumeric,
-    validWhen: false,
-    message: 'Solo se permiten letras.'
-  },
-  { 
-    field: 'nombre',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Nombre requerido.'
-  },
-  { 
-    field: 'apellido',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Apellido requerido.'
-  },
-  { 
-    field: 'apellido',
-    method: validator.isNumeric,
-    validWhen: false,
-    message: 'Solo se permiten letras.'
-  },
-  { 
-    field: 'rol',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Seleccione un rol.'
-  },
-]);
-
-const validatorArg2= new FormValidator([
-  {
-    field: 'username2',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Nombre de usuario requerido'
-  },
-  { 
-    field: 'password2',
-    method: validator.isEmpty,
-    validWhen: false,
-    message: 'Contraseña requerida'
-  },
-]);
+import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, FilterList, FirstPage, LastPage, Remove, SaveAlt, Search, ViewColumn } from '@material-ui/icons';
 
 
-let validationResponse =  {};
-const Usuarios = ({classes,mobile}) =>{
+  const tableIcons = {
+      Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+      Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+      Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+      Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+      DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+      Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+      Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+      Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+      FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+      LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+      NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+      PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
+      ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+      Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+      SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+      ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+      ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
+    };
 
-  const { addToast } = useToasts();
-  const [state,setState] = useState({
-    username:'',
-    password:'',
-    messageDialog:'',
-    showDialog:false,
-  });
-  const [ formState, setFormState ] = useState({
-    username:{value:'',errorMessage:''},
-    password:{value:'',errorMessage:''},
-    nombre:{value:'',errorMessage:''},
-    apellido:{value:'',errorMessage:''},
-    email:{value:'',errorMessage:''},
-    rol:{value:'',errorMessage:''},
-  });
-
-
-  const [ formState2, setFormState2 ] = useState({
-    username2:{value:'',errorMessage:''},
-    password2:{value:'',errorMessage:''},
-  });
-
-  const [users, setUsers] = useState(null);
-  
-  useEffect(() =>{
-    const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-    if (!Auth.loggedIn()){
-      Auth.logout();
+  function usuariosReducer(state, action) {
+    switch (action.type) {
+      case 'field': {
+        return {
+          ...state,
+          error: false,
+          usuario: {...state.usuario, [action.fieldName]:action.payload},
+        };
+      }
+      case 'load': {
+        return {
+          ...state,
+          error: '',
+          isLoading: true,
+        };
+      }
+      case 'usuarios': {
+        return {
+          ...state,
+          usuarios: action.payload,
+          isLoading: false,
+        };
+      }
+      case 'usuario': {
+        return {
+          ...state,
+          usuario: action.payload,
+          isLoading: false,
+        };
+      }
+      case 'error': {
+        return {
+          ...state,
+          error: true,
+          showError: true,
+          isLoading: false,
+        };
+      }
+      case 'logOut': {
+        return {
+          ...state,
+          isLoggedIn: false,
+        };
+      }
+      case 'hideModal': {
+        return {
+          ...state,
+          open: false,
+        };
+      }
+      case 'showModal': {
+        return {
+          ...state,
+          open: true,
+        };
+      }
+      case 'editar': {
+        return {
+          ...state,
+          editar: true,
+        };
+      }
+      case 'noEditar': {
+        return {
+          ...state,
+          editar: false,
+        };
+      }
+      default:
+        return state;
     }
+  }
+  
+  const initialState = {
+    usuarios: [],
+    usuario: null,
+    isLoading: false,
+    error: false,
+    showError: false,
+    isLoggedIn: false,
+    open: false,
+    editar: false,
+  };
 
+const Usuarios = ({ classes, mobile }) => {
+
+  const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
+
+  const [state, dispatch] = useReducer(usuariosReducer, initialState);
+  const { usuarios, usuario, isLoading, open, editar, error, showError } = state;
+
+  let fields = [{ 
+    label: 'Rol',
+    columnSize: '20%',
+    field: 'rol',
+    validWhen: false,
+    message: 'Seleccione un rol',
+    error: false,
+    type: 'select',
+    options: [{
+      label: 'Piloto',
+      value: 1
+    }, {
+      label: 'Solicitante',
+      value: 2
+    }, {
+      label: 'Administrador',
+      value: 3
+    }, {
+      label: 'Director',
+      value: 4
+    }]
+  }, {
+    label: 'Nombres',
+    columnSize: '40%',
+    field: 'nombre',
+    validWhen: false,
+    message: 'Nombres requeridos',
+    error: false,
+    type: 'text'
+  }, { 
+    label: 'Apellido',
+    columnSize: '40%',
+    field: 'apellido',
+    validWhen: true,
+    message: 'Apellidos requeridos',
+    error: false,
+    type: 'text'
+  }, { 
+    label: 'Edad',
+    columnSize: '40%',
+    field: 'edad',
+    validWhen: false,
+    message: 'Edad requerida',
+    error: false,
+    type: 'text'
+  }, { 
+    label: 'DPI',
+    columnSize: '60%',
+    field: 'dpi',
+    validWhen: false,
+    message: 'DPI requerido',
+    error: false,
+    type: 'text'
+  }, { 
+    label: 'Correo electrónico',  
+    columnSize: '100%',
+    field: 'username',  
+    validWhen: true,
+    message: 'Correo electrónico requerido',
+    error: false,
+    type: 'text'
+  }, { 
+    label: 'Contraseña',  
+    columnSize: '100%',
+    field: 'password',  
+    validWhen: true,
+    message: 'Contraseña requerida',
+    error: false,
+    type: 'password'
+  }];
+  
+  let columns= [
+    { 
+      title: 'Rol', 
+      field: 'rol',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rol}</div>
+    },
+    { 
+      title: 'Nombres', 
+      field: 'nombre',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombre}</div>
+    },
+    { 
+      title: 'Apellidos', 
+      field: 'apellido',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.apellido}</div>
+    },
+    { 
+      title: 'Correo electrónico', 
+      field: 'username',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.username}</div>
+    },
+  ];
+
+  useEffect(() =>{
     let signal = axios.CancelToken.source();
-    const getUsuarios = async ()=>{
-      let UserHelperMethodsInstance = new UserHelperMethods(process.env.REACT_APP_EP);
-
+    const getTodosUsuarios = async ()=>{
       try {
-        const response = await UserHelperMethodsInstance.buscarUsuarios(signal.token);
-        setUsers(response);
+        dispatch({ type: 'load' });
+        const response = await UsuariosHelper.buscarUsuarios(signal.token)
+        if (response) {
+          dispatch({ type: 'usuarios', payload: response });
+        } 
+      } catch (error) {
+          if (axios.isCancel(error)) {
+            //console.log('Error: ', error.message); // => prints: Api is being canceled
+        }
+      }  
+    }
+    getTodosUsuarios();
+    return ()=>{signal.cancel('Api is being canceled');}
+  },[]);
+
+  const handleOpen = () => {
+    dispatch({ type: 'showModal' });
+  };
+
+  const handleClose = () => {
+    dispatch({ type: 'hideModal' });
+  };
+  
+  const handleChange = event => {
+    event.preventDefault();
+    dispatch({
+      type: 'field',
+      fieldName: event.target.id,
+      payload: event.currentTarget.value,
+    });
+  }
+
+  const handleSubmit = event => {
+      event.preventDefault();
+      validateForm();
+      if(!error){
+          enviarUsuario()
+      }
+  }
+
+  const validateForm = () => {
+    fields.forEach(field => {
+      if(!error && !usuario[field.field]) {
+        dispatch({ type: 'error' });
+      }
+    });
+  }
+
+  const enviarUsuario = async () => {
+    try {
+      let saveResponse = await UsuariosHelper.guardarUsuario(usuario);
+      usuarios.push(usuario);
+      dispatch({ type: 'usuarios', payload: usuarios });
+      handleClose();
+    }
+    catch (error) {
+      console.log(error);
+    } 
+  }
+
+  const editarUsuario = async () => {
+    try {
+      let saveResponse = await UsuariosHelper.guardarUsuario(usuario);
+      let signal = axios.CancelToken.source();
+      
+      try {
+        dispatch({ type: 'load' });
+        const response = await UsuariosHelper.buscarUsuarios(signal.token)
+        if (response) {
+          dispatch({ type: 'usuarios', payload: response });
+        } 
       } catch (error) {
         if (axios.isCancel(error)) {
           //console.log('Error: ', error.message); // => prints: Api is being canceled
         }
-      }
-      
+      }  
+
+      dispatch({ type: 'noEditar'});
     }
-
-    getUsuarios();
-
-    return ()=>{signal.cancel('Api is being canceled');}
-  },[]);
-
-  function handleSubmit(event){
-
-    event.preventDefault();
-    const username = event.target.username.value;
-    const password = event.target.password.value;
-    const nombre = event.target.nombre.value;
-    const apellido = event.target.apellido.value;
-    const rol = event.target.rol.value;
-
-    const validation = validatorArg.validate({username,password,nombre,apellido,rol});
-    setFormState({username:{value:username,errorMessage:validation.username.message},password:{value:password,errorMessage:validation.password.message},nombre:{value:nombre,errorMessage:validation.nombre.message},apellido:{value:apellido,errorMessage:validation.apellido.message},rol:{value:rol,errorMessage:validation.rol.message}});
-    validationResponse = {username: validation.username.isInvalid,password:validation.password.isInvalid,nombre:validation.nombre.isInvalid,apellido:validation.apellido.isInvalid,rol:validation.rol.isInvalid};
-
-    const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-    if (validation.isValid) {
-      event.target.username.value = '';
-      event.target.password.value = '';
-      event.target.nombre.value = '';
-      event.target.apellido.value = '';
-      event.target.rol.value = '';
-
-      Auth.signUp(username, password,nombre,apellido,rol)
-        .then(res => {
-          if (res.status === 400) {
-            setState(state => ({
-              ...state,
-              messageDialog:res.err,
-              showDialog:true,
-            }));
-            
-          }
-          else if (res.status === 200){
-            setState(state => ({
-              ...state,
-              messageDialog:"Creado con exito",
-              showDialog:true,
-            }));
-          }
-        })
-        .catch(err => {
-          setState(state => ({
-            ...state,
-            messageDialog:"Ha ocurrido un error, intenta mas tarde",
-            showDialog:true,
-          }));
-        });
-    }else{
-      addToast('Verifique los campos', { appearance: 'error', autoDismiss:true });
-    }
-    return;
-
+    catch (error) {
+      console.log(error);
+    } 
   }
-  function handleSubmitContraseña(event){
 
-    event.preventDefault();
-    const username2 = event.target.username2.value;
-    const password2 = event.target.password2.value;
-
-    const validation = validatorArg2.validate({username2: username2,password2: password2});
-   
-    setFormState2({username2:{value:username2,errorMessage:validation.username2.message},password2:{value:password2,errorMessage:validation.password2.message}});
-    validationResponse = {username2: validation.username2.isInvalid,password2:validation.password2.isInvalid};
-    
-    const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-    if (validation.isValid) {
-      event.target.username2.value = '';
-      event.target.password2.value = '';
-      Auth.resetPassword(username2, password2)
-        .then(res => {
-          if (res.status === 400) {
-            setState(state => ({
-              ...state,
-              messageDialog:res.err,
-            }));
-            
-          }
-          else if (res.status === 200){
-            addToast('Contraseña reiniciada exitosamente!', { appearance: 'success', autoDismiss:true });
-            event.target.password2.value = '';
-            setState(state => ({
-              ...state,
-              messageDialog:"Contraseña reiniciada con exito",
-            }));
-          }
-        })
-        .catch(err => {
-          setState(state => ({
-            ...state,
-            messageDialog:"Ha ocurrido un error, intenta mas tarde",
-          }));
-        });
-    }else{
-      addToast('Verifique los campos', { appearance: 'error', autoDismiss:true });
-    }
-    return;
-
-
-  }
-  function handleClose() { 
-    setState(state => ({
-      ...state,
-      showDialog:false
-    }));
-  }
-        
-  return(
-      <Grid container item xs={12} md={12} component={Paper} elevation={5} square spacing={2} style={{backgroundColor:'transparent', padding:'10vh'}} justify={'center'} alignContent='center'>
-        <Grid container item className={classes.paper} spacing={1} justify={'center'}>
-          <Grid item container>
-          <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
-          Crear usuario
-        </Typography>
+    return (
+    <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
+      <div className="usuarios">
+        <div className="usuarios__encabezado">
+          <Grid container justify='flex-end'>
+            <Button className="usuarios__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar usuario</Button>
           </Grid>
-        
-        <form className={classes.form} onSubmit={handleSubmit} noValidate autoComplete='off'>
-          <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                variant="outlined"
-                margin="dense"
-                required
-                fullWidth
+
+          <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
+
+            { usuarios && !isLoading && <MaterialTable
+              icons={tableIcons}
+              columns={columns}
+              data={usuarios}
+              stickyHeader
+              title="Gestionar Usuarios"
+              style={{padding: '3vh', width:'100%', height:'auto'}}
+              options={{
+                search: false,
+                searchFieldAlignment:'left',
+                defaultGroupOrder:'0',
+                pageSize: 10,
+                actionsColumnIndex: -1,
+                rowStyle:{backgroundColor:'whitesmoke',
+                emptyRowsWhenPaging: true,}}
+                }
+                
+              localization={{ 
+                toolbar: { searchPlaceholder: 'Buscar' },
+                body: {
+                    emptyDataSourceMessage: 'No hay resultados',
+                    filterRow: {
+                        filterTooltip: 'Filter'
+                    }
+                },
+                header:{
+                  actions:''
+                } 
+                }}
+
+                actions={[
+                  {
+                    icon: tableIcons.Edit,
+                    tooltip: 'Editar usuario',
+                    onClick: (event, rowData) => {
+                      // Do save operation
+                      dispatch({type: 'editar'})
+                      dispatch({ type: 'usuario', payload: rowData });
+
+                    }
+                  },
+                  {
+                    icon: tableIcons.Delete,
+                    tooltip: 'Eliminar usuario',
+                    onClick: (event, rowData) => {
+                      // Do save operation
+                    }
+                  }
+                ]}
+                
+            />}
+
+            {isLoading && <Grid> Cargando usuarios ...</Grid>}
+          </Grid>
+
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+           <FormularioEntidad type="usuarios" fields={fields} onChange={handleChange} onSubmit={handleSubmit} /> 
+          </Modal>
+          <Modal
+            open={editar}
+            onClose={()=> dispatch({ type: 'noEditar'})}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+          <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
+            {usuario && <form noValidate autoComplete="off" spacing={2} >
+              <TextField
+                id="rol"
+                label='Rol'
+                value={usuario.rol || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
+              />
+              <TextField
                 id="nombre"
-                label="Nombres"
-                name="nombre"
-                autoFocus
-                error={validationResponse.nombre}
-                helperText={formState.nombre.errorMessage}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-              <TextField
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              id="apellido"
-              label="Apellidos"
-              name="apellido"
-              error={validationResponse.apellido}
-              helperText={formState.apellido.errorMessage}
+                label='Nombres'
+                value={usuario.nombre || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
               />
-              </Grid>
-              <Grid item xs={12} md={6}>
               <TextField
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              id="username"
-              label="Correo electronico"
-              name="username"
-              error={validationResponse.username}
-              helperText={formState.username.errorMessage}
+                id="apellido"
+                label='Apellidos'
+                value={usuario.apellido || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
               />
-              </Grid>
-              <Grid item xs={12} md={6}>
               <TextField
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              name="password"
-              label="Contraseña"
-              type="text"
-              id="password"
-              error={validationResponse.password}
-              helperText={formState.password.errorMessage}
+                id="edad"
+                label='Edad'
+                value={usuario.edad || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
               />
-              </Grid>
-              <Grid item xs={12} md={6}>
-              <FormControl variant="outlined" fullWidth margin='dense' className={classes.formControl} error={validationResponse.rol}>
-                  <InputLabel htmlFor="outlined-age-native-simple">Rol</InputLabel>
-                  <Select
-                  native
-                  required
-                  name="rol"
-                  label="Rol"
-                  inputProps={{
-                      name: 'rol',
-                      id: 'outlined-age-native-simple',
-                  }}
-                  //onChange={event => {inputs.rol = event.target.value; setRender(!render)}}
-                  >
-                  <option aria-label="None" value="" />
-                  <option value={'1'}>Director</option>
-                  <option value={'2'}>Administrador de estación</option>
-                  <option value={'3'}>Trabajador Social</option>
-                  <option value={'4'}>Piloto</option>
-                  </Select>
-                  { validationResponse.rol && <FormHelperText>Seleccione un rol</FormHelperText>}
-              </FormControl>  
-              </Grid>
-              <Dialog
-                open={state.showDialog}
-                onClose={handleClose}
-                TransitionComponent={Transition}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
-                <DialogContent className={classes.dialogContent} >
-                <Avatar  className={classes.bigAvatar} >
-                <Info className={classes.icon} />
-                </Avatar>
-                  <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
-                    {state.messageDialog}
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose} autoFocus>
-                    Cerrar
-                  </Button>
-                </DialogActions>
-              </Dialog>
-              <Grid container item xs={12} md={12} justify='center' spacing={2}>
-                <Grid item xs={12} md={3}>
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    >
-                    Crear
-                  </Button>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    className={classes.submit}
-                    style={{backgroundColor:'red !important'}}
-                    >
-                    Borrar
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-          </form>
-        </Grid>
-
-        <Grid container item className={classes.paper} spacing={1} justify={'center'}>
-        <Grid item container>
-          <Typography component="h1" variant="h5" style={{color:'#54686f'}}>
-            Reiniciar contraseña
-          </Typography>
-        </Grid>
-        <form className={classes.form} onSubmit={handleSubmitContraseña} noValidate autoComplete='off'>
-          <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-              <FormControl variant="outlined" fullWidth margin='dense' className={classes.formControl} error={validationResponse.username2}>
-                  <InputLabel htmlFor="outlined-age-native-simple">Usuario</InputLabel>
-                  <Select
-                  native
-                  required
-                  name="username2"
-                  label="Usuario"
-                  inputProps={{
-                      name: 'username2',
-                      id: 'outlined-age-native-simple',
-                  }}
-                  //onChange={event => {inputs.rol = event.target.value; setRender(!render)}}
-                  >
-                  <option aria-label="None" value="" />
-
-                  {users && users.map((res)=>{
-                    return <option key={res.id} value={res.username}>{res.username}</option>
-                  })}
-                  </Select>
-                  { validationResponse.username2 && <FormHelperText>Seleccione un usuario</FormHelperText>}
-              </FormControl>  
-              </Grid>
-              <Grid item xs={12} md={6}>
               <TextField
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              name="password2"
-              label="Contraseña"
-              type="text"
-              id="password2"
-              error={validationResponse.password2}
-              helperText={formState2.password2.errorMessage}
+                id="dpi"
+                label='DPI'
+                value={usuario.dpi || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
               />
-              </Grid>
-              <Dialog
-                open={state.showDialog}
-                onClose={handleClose}
-                TransitionComponent={Transition}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-              >
-                <DialogTitle id="alert-dialog-title">{"Attention!"}</DialogTitle>
-                <DialogContent className={classes.dialogContent} >
-                <Avatar  className={classes.bigAvatar} >
-                <Info className={classes.icon} />
-                </Avatar>
-                  <DialogContentText id="alert-dialog-description" className={classes.DialogContentText}>
-                    {state.messageDialog}
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose} autoFocus>
-                    Cerrar
-                  </Button>
-                </DialogActions>
-              </Dialog>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                >
-                Reiniciar contraseña
+              <TextField
+                id="username"
+                label='Correo electrónico'
+                value={usuario.username || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
+              />
+              <TextField
+                id="password"
+                label='Contraseña'
+                value={usuario.password || ''}
+                variant='standard'
+                style={{paddingLeft:'1rem'}}
+                onChange={handleChange}
+              />
+              <Button onClick={()=> dispatch({type:'noEditar'})} style={{backgroundColor: '#e04046',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
+                Cancelar
               </Button>
-            </Grid>
-          </form>
-        </Grid>
-      </Grid>
-  );
-    
+              <Button onClick={editarUsuario} style={{backgroundColor: 'green',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
+                Guardar
+              </Button>
+            </form>}
+          </Grid>
+          </Modal>
+        </div>
+      </div>
+    </Grid>
+    );
 }
-
-Usuarios.propTypes= {
-  classes: PropTypes.object,
-  mobile: PropTypes.bool,
-};
 
 export default Usuarios;

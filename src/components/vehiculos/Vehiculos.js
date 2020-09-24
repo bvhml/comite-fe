@@ -142,84 +142,103 @@ const Vehiculos = ({ classes, mobile }) => {
     field: 'marca',
     validWhen: false,
     message: 'Ingrese la marca',
-    error: false
+    error: false,
+    type: 'text'
   }, {
     label: 'Placa',
     columnSize: '20%',
     field: 'placa',
     validWhen: false,
     message: 'Placa requerida',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Modelo',
     columnSize: '20%',
     field: 'modelo',
     validWhen: true,
     message: 'Ingrese el modelo',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Línea',
     columnSize: '30%',
     field: 'linea',
     validWhen: false,
     message: 'Ingrese la línea',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Tipo',
     columnSize: '20%',
     field: 'tipo',
     validWhen: false,
     message: 'Seleccione un tipo de vehículo',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Chasis',
     columnSize: '40%',
     field: 'chasis',
     validWhen: false,
     message: 'Ingrese el código del chasis',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Motor',
     columnSize: '40%',
     field: 'tamaño_motor',
     validWhen: false,
     message: 'Ingrese el tamaño del motor',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Cilindros',
     columnSize: '30%',
     field: 'cant_cilindros',
     validWhen: false,
     message: 'Ingrese un número de cilindros válido',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Toneladas',
     columnSize: '30%',
     field: 'toneladas',
     validWhen: false,
     message: 'Ingrese un número de toneladas válido',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Transmisión',
     columnSize: '40%',
     field: 'transmision',
     validWhen: false,
     message: 'Seleccione el tipo de transmisión',
-    error: false
+    error: false,
+    type: 'select',
+    options: [{
+      label: 'Mecánica',
+      value: 'Mecánica'
+    }, {
+      label: 'Automática',
+      value: 'Automática'
+    }]
   }, { 
     label: 'Número de asientos',
     columnSize: '50%',
     field: 'asientos',
     validWhen: false,
     message: 'Ingrese un número de asientos válido',
-    error: false
+    error: false,
+    type: 'text'
   }, { 
     label: 'Color',
     columnSize: '50%',
     field: 'color',
     validWhen: false,
     message: 'Ingrese un color',
-    error: false
+    error: false,
+    type: 'text'
   }];
   
   let columns= [
@@ -349,7 +368,7 @@ const Vehiculos = ({ classes, mobile }) => {
 
           <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
 
-            { vehiculos && !isLoading && <MaterialTable
+            { vehiculos && vehiculos.length && !isLoading && <MaterialTable
               icons={tableIcons}
               columns={columns}
               data={vehiculos}
