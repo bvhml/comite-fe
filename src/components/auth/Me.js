@@ -41,6 +41,7 @@ export const validatorArg = new FormValidator([
         password:'',
         messageDialog:'',
         showDialog:false,
+        bandera:false,
       });
  
    
