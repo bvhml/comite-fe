@@ -27,7 +27,7 @@ export default class VehiculoHelperMethods {
             return jsonResponse;
         }
         catch (error) {
-            return error;
+            throw error;
         }
     }
 

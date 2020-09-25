@@ -302,7 +302,7 @@ const Vehiculos = ({ classes, mobile }) => {
       type: 'field',
       fieldName: event.target.id,
       payload: event.currentTarget.value,
-    });
+    })
   }
 
   const handleSubmit = event => {
@@ -333,7 +333,8 @@ const Vehiculos = ({ classes, mobile }) => {
     } 
   }
 
-  const editarVehiculo = async () => {
+  const editarVehiculo = async (event) => {
+    event.preventDefault();
     try {
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
       let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
@@ -429,7 +430,7 @@ const Vehiculos = ({ classes, mobile }) => {
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
           >
-           <FormularioEntidad type="vehiculos" fields={fields} onChange={handleChange} onSubmit={handleSubmit} /> 
+           <FormularioEntidad title="Nuevo vehículo" fields={fields} model={null} onChange={handleChange} onSubmit={handleSubmit} /> 
           </Modal>
           <Modal
             open={editar}
@@ -438,7 +439,9 @@ const Vehiculos = ({ classes, mobile }) => {
             aria-describedby="simple-modal-description"
           >
           <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-            {vehiculo && <form noValidate autoComplete="off" spacing={2} >
+            {
+              vehiculo && <FormularioEntidad title="Editar vehículo" fields={fields} model={vehiculo} onChange={handleChange} onSubmit={editarVehiculo} /> 
+            /* {vehiculo && <form noValidate autoComplete="off" spacing={2} >
               <TextField
               id="marca"
               label='Marca'
@@ -542,7 +545,7 @@ const Vehiculos = ({ classes, mobile }) => {
               <Button onClick={editarVehiculo} style={{backgroundColor: 'green',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
                 Guardar
               </Button>
-            </form>}
+            </form>} */}
           </Grid>
           </Modal>
         </div>
