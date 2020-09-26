@@ -203,6 +203,7 @@ export default function App (props) {
               <Register classes={classes} mobile={mobile}/>
             </Route>
             <PrivateRoute path="/home/:pagina" component={ProtectedRoute}/>
+            <PrivateRoute path="/home/:pagina/:entidad" component={ProtectedRoute}/>
           </Router>
         </ToastProvider>
       </ThemeProvider>

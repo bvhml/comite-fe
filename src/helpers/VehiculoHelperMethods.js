@@ -56,6 +56,34 @@ export default class VehiculoHelperMethods {
         }
     }
 
+
+    //MANTENIMIENTOS
+
+    obtenerTodosMantenimientoVehiculo = async (vehiculoId,cancelToken) => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                cancelToken
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/mantenimiento-vehiculo/${vehiculoId}`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+
     obtenerVehiculo() {
 
     }

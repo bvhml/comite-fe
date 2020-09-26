@@ -18,6 +18,7 @@ import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Usuarios } from '../usuarios/index';
 import Vehiculos from '../vehiculos/Vehiculos';
+import MantenimientoVehiculo from '../vehiculos/MantenimientoVehiculo';
 
 import './inicio.css'
 
@@ -57,6 +58,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
   },[history]);
   
   const selectNavOption = (option) => {
+    
     if(option === 'logout') {
       Auth.logout(); 
       history.push('/');
@@ -129,5 +131,7 @@ const getComponent = (pagina, classes, mobile) => {
   switch(pagina) {
     case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
     case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
+    case 'mantenimiento-vehiculo': return <MantenimientoVehiculo classes={classes} mobile={mobile}/>
+    default: return <Vehiculos classes={classes} mobile={mobile}/>
   }
 }

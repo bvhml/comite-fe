@@ -24,7 +24,7 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import { useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
   const tableIcons = {
       Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -53,7 +53,7 @@ import { useHistory } from 'react-router-dom';
         return {
           ...state,
           error: false,
-          vehiculo: {...state.vehiculo,[action.fieldName]:action.payload},
+          mantenimiento: {...state.mantenimiento,[action.fieldName]:action.payload},
         };
       }
       case 'load': {
@@ -63,17 +63,17 @@ import { useHistory } from 'react-router-dom';
           isLoading: true,
         };
       }
-      case 'vehiculos': {
+      case 'mantenimientos': {
         return {
           ...state,
-          vehiculos: action.payload,
+          mantenimientos: action.payload,
           isLoading: false,
         };
       }
-      case 'vehiculo': {
+      case 'mantenimiento': {
         return {
           ...state,
-          vehiculo: action.payload,
+          mantenimiento: action.payload,
           isLoading: false,
         };
       }
@@ -121,8 +121,8 @@ import { useHistory } from 'react-router-dom';
   }
   
   const initialState = {
-    vehiculos: [],
-    vehiculo: null,
+    mantenimientos: [],
+    mantenimiento: null,
     isLoading: false,
     error: false,
     showError: false,
@@ -136,8 +136,9 @@ const Vehiculos = ({ classes, mobile }) => {
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
 
   const [state, dispatch] = useReducer(vehiculosReducer, initialState);
-  const { vehiculos, vehiculo, isLoading, open, editar, error, showError } = state;
-  const history = useHistory();
+  const { mantenimientos, mantenimiento, isLoading, open, editar, error, showError } = state;
+  let { entidad } = useParams();
+
 
   let fields = [{ 
     label: 'Marca',
@@ -249,50 +250,47 @@ const Vehiculos = ({ classes, mobile }) => {
   
   let columns= [
     { 
-      title: 'Piloto Asignado', 
-      field: 'piloto',
+      title: 'Descripcion', 
+      field: 'descripcion',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.piloto}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.descripcion}</div>
     },
     { 
-      title: 'Vehículo', 
-      field: 'marca',
+      title: 'Lugar', 
+      field: 'lugar',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.marca}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.lugar}</div>
     },
     { 
-      title: 'Transmisión', 
-      field: 'transmision',
+      title: 'Fecha', 
+      field: 'fecha',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.transmision}</div>
-    },
-    { 
-      title: 'Placa', 
-      field: 'placa',
-      searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.placa}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.fecha}</div>
     },
   ];
 
   useEffect(() =>{
     let signal = axios.CancelToken.source();
     const getTodosVehiculos = async ()=>{
-      const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      try {
-        dispatch({ type: 'load' });
-        const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
-        if (response) {
-          dispatch({ type: 'vehiculos', payload: response });
-        } 
-      } catch (error) {
-          if (axios.isCancel(error)) {
-            //console.log('Error: ', error.message); // => prints: Api is being canceled
-        }
-      }  
+
+      if (entidad){
+        const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
+        try {
+          dispatch({ type: 'load' });
+          const response = await VehiculosHelper.obtenerTodosMantenimientoVehiculo(entidad, signal.token)
+          if (response) {
+              dispatch({ type: 'mantenimientos', payload: response });
+          } 
+        } catch (error) {
+            if (axios.isCancel(error)) {
+              //console.log('Error: ', error.message); // => prints: Api is being canceled
+          }
+        }  
+      }
     }
     getTodosVehiculos();
     return ()=>{signal.cancel('Api is being canceled');}
-  },[]);
+  },[entidad]);
 
   const handleOpen = () => {
     dispatch({ type: 'showModal' });
@@ -321,7 +319,7 @@ const Vehiculos = ({ classes, mobile }) => {
 
   const validateForm = () => {
     fields.forEach(field => {
-      if(!error && !vehiculo[field.field]) {
+      if(!error && !mantenimiento[field.field]) {
         dispatch({ type: 'error' });
       }
     });
@@ -329,9 +327,9 @@ const Vehiculos = ({ classes, mobile }) => {
 
   const enviarVehiculo = async () => {
     try {
-      let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
-      vehiculos.push(vehiculo);
-      dispatch({ type: 'vehiculos', payload: vehiculos });
+      let saveResponse = await VehiculosHelper.guardarVehiculo(mantenimiento);
+      mantenimientos.push(mantenimiento);
+      dispatch({ type: 'mantenimientos', payload: mantenimientos });
       handleClose();
     }
     catch (error) {
@@ -343,14 +341,14 @@ const Vehiculos = ({ classes, mobile }) => {
     event.preventDefault();
     try {
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
+      let saveResponse = await VehiculosHelper.guardarVehiculo(mantenimiento);
       let signal = axios.CancelToken.source();
       
       try {
         dispatch({ type: 'load' });
         const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
         if (response) {
-          dispatch({ type: 'vehiculos', payload: response });
+          dispatch({ type: 'mantenimientos', payload: response });
         } 
       } catch (error) {
           if (axios.isCancel(error)) {
@@ -370,17 +368,16 @@ const Vehiculos = ({ classes, mobile }) => {
       <div className="vehiculos">
         <div className="vehiculos__encabezado">
           <Grid container justify='flex-end'>
-            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar vehículo</Button>
+            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Nuevo mantenimiento</Button>
           </Grid>
-
+          
           <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
-            {console.log(vehiculos)}
-            { vehiculos && (vehiculos.length > 0) && !isLoading && <MaterialTable
+            { mantenimientos && !isLoading && <MaterialTable
               icons={tableIcons}
               columns={columns}
-              data={vehiculos}
+              data={mantenimientos}
               stickyHeader
-              title="Gestionar Vehiculos"
+              title="Gestionar mantenimientos"
               style={{padding: '3vh', width:'100%', height:'auto'}}
               options={{
                 search: false,
@@ -407,34 +404,20 @@ const Vehiculos = ({ classes, mobile }) => {
 
                 actions={[
                   {
-                    icon: tableIcons.BuildIcon,
-                    tooltip: 'Mantenimiento de vehiculo',
-                    onClick: (event, rowData) => {
-                      history.push(`/home/mantenimiento-vehiculo/${rowData.id}`)
-                    }
-                  },
-                  {
                     icon: tableIcons.Edit,
-                    tooltip: 'Editar vehiculo',
+                    tooltip: 'Editar mantenimiento',
                     onClick: (event, rowData) => {
                       
                       dispatch({type: 'editar'})
-                      dispatch({ type: 'vehiculo', payload: rowData });
+                      dispatch({ type: 'mantenimiento', payload: rowData });
 
-                    }
-                  },
-                  {
-                    icon: tableIcons.Delete,
-                    tooltip: 'Eliminar vehiculo',
-                    onClick: (event, rowData) => {
-                      
                     }
                   },
                 ]}
                 
-            />}
-
-            {isLoading && <Grid> Cargando vehiculos ...</Grid>} 
+            /> }
+            {console.log(mantenimientos)}
+            {isLoading && <Grid> Cargando mantenimientos ...</Grid>} 
           </Grid>
 
           <Modal
@@ -452,7 +435,7 @@ const Vehiculos = ({ classes, mobile }) => {
             aria-describedby="simple-modal-description"
           >
           <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-            { vehiculo && <FormularioEntidad title="Editar vehículo" fields={fields} model={vehiculo} onChange={handleChange} onSubmit={editarVehiculo} /> }
+            { mantenimiento && <FormularioEntidad title="Editar vehículo" fields={fields} model={mantenimiento} onChange={handleChange} onSubmit={editarVehiculo} /> }
           </Grid>
           </Modal>
         </div>
