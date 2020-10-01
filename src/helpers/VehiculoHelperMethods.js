@@ -59,7 +59,7 @@ export default class VehiculoHelperMethods {
 
     //MANTENIMIENTOS
 
-    getMantenimientos(vehiculoId) {
+    async getMantenimientos(vehiculoId, cancelToken) {
         try {
             const Auth = new AuthHelperMethods(this.domain);
             let config = {
@@ -84,7 +84,7 @@ export default class VehiculoHelperMethods {
         }
     }
 
-    guardarMantenimiento(mantenimiento) {
+    async guardarMantenimiento(mantenimiento) {
         try {
             const Auth = new AuthHelperMethods(this.domain);
             let config = {

@@ -195,7 +195,7 @@ const Mantenimientos = ({ classes, mobile }) => {
         const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
         try {
           dispatch({ type: 'load' });
-          const response = await VehiculosHelper.getMantenimientos(idVehiculo)
+          const response = await VehiculosHelper.getMantenimientos(idVehiculo, signal.token)
           if (response) {
               dispatch({ type: 'mantenimientos', payload: response });
           } 
