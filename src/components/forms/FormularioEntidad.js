@@ -5,6 +5,7 @@ import { Button } from '@material-ui/core';
 import './forms.scss';
 import InputEntidad from './InputEntidad';
 import SelectEntidad from './SelectEntidad';
+import TextAreaEntidad from './TextAreaEntidad'
 
 const FormularioEntidad = ({ title, fields, model, onChange, onSubmit }) => {
 
@@ -21,6 +22,14 @@ const FormularioEntidad = ({ title, fields, model, onChange, onSubmit }) => {
                                             field={field.field}
                                             columnSize={field.columnSize} 
                                             options={field.options}
+                                            label={field.label} 
+                                            handleChange={onChange} />
+                            case 'textarea':
+                                return <TextAreaEntidad 
+                                            model={model} 
+                                            field={field.field} 
+                                            type={field.type} 
+                                            columnSize={field.columnSize} 
                                             label={field.label} 
                                             handleChange={onChange} />
                             default:                                

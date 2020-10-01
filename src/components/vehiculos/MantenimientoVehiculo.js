@@ -131,7 +131,7 @@ import { useParams } from 'react-router-dom';
     editar: false,
   };
 
-const Vehiculos = ({ classes, mobile }) => {
+const Mantenimientos = ({ classes, mobile }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
 
@@ -141,111 +141,29 @@ const Vehiculos = ({ classes, mobile }) => {
 
 
   let fields = [{ 
-    label: 'Marca',
-    columnSize: '30%',
-    field: 'marca',
-    validWhen: false,
-    message: 'Ingrese la marca',
-    error: false,
-    type: 'text'
-  }, {
-    label: 'Placa',
-    columnSize: '20%',
-    field: 'placa',
-    validWhen: false,
-    message: 'Placa requerida',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Modelo',
-    columnSize: '20%',
-    field: 'modelo',
-    validWhen: true,
-    message: 'Ingrese el modelo',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Línea',
-    columnSize: '30%',
-    field: 'linea',
-    validWhen: false,
-    message: 'Ingrese la línea',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Tipo',
-    columnSize: '20%',
-    field: 'tipo',
-    validWhen: false,
-    message: 'Seleccione un tipo de vehículo',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Chasis',
-    columnSize: '40%',
-    field: 'chasis',
-    validWhen: false,
-    message: 'Ingrese el código del chasis',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Motor',
-    columnSize: '40%',
-    field: 'tamaño_motor',
-    validWhen: false,
-    message: 'Ingrese el tamaño del motor',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Cilindros',
-    columnSize: '30%',
-    field: 'cant_cilindros',
-    validWhen: false,
-    message: 'Ingrese un número de cilindros válido',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Toneladas',
-    columnSize: '30%',
-    field: 'toneladas',
-    validWhen: false,
-    message: 'Ingrese un número de toneladas válido',
-    error: false,
-    type: 'text'
-  }, { 
-    label: 'Transmisión',
-    columnSize: '40%',
-    field: 'transmision',
-    validWhen: false,
-    message: 'Seleccione el tipo de transmisión',
-    error: false,
-    type: 'select',
-    options: [{
-      label: 'Mecánica',
-      value: 'Mecánica'
-    }, {
-      label: 'Automática',
-      value: 'Automática'
-    }, {
-      label: 'Tiptronic',
-      value: 'Tiptronic'
-    }]
-  }, { 
-    label: 'Número de asientos',
+    label: 'Lugar',
     columnSize: '50%',
-    field: 'asientos',
+    field: 'lugar',
     validWhen: false,
-    message: 'Ingrese un número de asientos válido',
+    message: 'Ingrese el lugar',
     error: false,
     type: 'text'
   }, { 
-    label: 'Color',
+    label: 'Fecha',
     columnSize: '50%',
-    field: 'color',
+    field: 'fecha',
     validWhen: false,
-    message: 'Ingrese un color',
+    message: 'Ingrese la fecha',
     error: false,
     type: 'text'
+  }, { 
+    label: 'Descripción',
+    columnSize: '100%',
+    field: 'descripcion',
+    validWhen: false,
+    message: 'Ingrese la descripción',
+    error: false,
+    type: 'textarea'
   }];
   
   let columns= [
@@ -271,13 +189,13 @@ const Vehiculos = ({ classes, mobile }) => {
 
   useEffect(() =>{
     let signal = axios.CancelToken.source();
-    const getTodosVehiculos = async ()=>{
+    const getMantenimientos = async (idVehiculo)=>{
 
       if (entidad){
         const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
         try {
           dispatch({ type: 'load' });
-          const response = await VehiculosHelper.obtenerTodosMantenimientoVehiculo(entidad, signal.token)
+          const response = await VehiculosHelper.getMantenimientos(idVehiculo)
           if (response) {
               dispatch({ type: 'mantenimientos', payload: response });
           } 
@@ -288,7 +206,7 @@ const Vehiculos = ({ classes, mobile }) => {
         }  
       }
     }
-    getTodosVehiculos();
+    getMantenimientos(entidad);
     return ()=>{signal.cancel('Api is being canceled');}
   },[entidad]);
 
@@ -301,7 +219,6 @@ const Vehiculos = ({ classes, mobile }) => {
   };
   
   const handleChange = event => {
-    event.preventDefault();
     dispatch({
       type: 'field',
       fieldName: event.target.id,
@@ -313,7 +230,7 @@ const Vehiculos = ({ classes, mobile }) => {
       event.preventDefault();
       validateForm();
       if(!error){
-          enviarVehiculo()
+          enviarMantenimiento()
       }
   }
 
@@ -325,9 +242,9 @@ const Vehiculos = ({ classes, mobile }) => {
     });
   }
 
-  const enviarVehiculo = async () => {
+  const enviarMantenimiento = async () => {
     try {
-      let saveResponse = await VehiculosHelper.guardarVehiculo(mantenimiento);
+      let saveResponse = await VehiculosHelper.guardarMantenimiento(mantenimiento);
       mantenimientos.push(mantenimiento);
       dispatch({ type: 'mantenimientos', payload: mantenimientos });
       handleClose();
@@ -337,16 +254,15 @@ const Vehiculos = ({ classes, mobile }) => {
     } 
   }
 
-  const editarVehiculo = async (event) => {
+  const editarMantenimiento = async (event) => {
     event.preventDefault();
     try {
-      const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      let saveResponse = await VehiculosHelper.guardarVehiculo(mantenimiento);
+      let saveResponse = await VehiculosHelper.guardarMantenimiento(mantenimiento);
       let signal = axios.CancelToken.source();
       
       try {
         dispatch({ type: 'load' });
-        const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
+        const response = await VehiculosHelper.getMantenimientos(entidad)
         if (response) {
           dispatch({ type: 'mantenimientos', payload: response });
         } 
@@ -364,84 +280,84 @@ const Vehiculos = ({ classes, mobile }) => {
   }
 
     return (
-    <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
-      <div className="vehiculos">
-        <div className="vehiculos__encabezado">
-          <Grid container justify='flex-end'>
-            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Nuevo mantenimiento</Button>
-          </Grid>
-          
-          <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
-            { mantenimientos && !isLoading && <MaterialTable
-              icons={tableIcons}
-              columns={columns}
-              data={mantenimientos}
-              stickyHeader
-              title="Gestionar mantenimientos"
-              style={{padding: '3vh', width:'100%', height:'auto'}}
-              options={{
-                search: false,
-                searchFieldAlignment:'left',
-                defaultGroupOrder:'0',
-                pageSize: 10,
-                actionsColumnIndex: -1,
-                rowStyle:{backgroundColor:'whitesmoke',
-                emptyRowsWhenPaging: true,}}
-                }
-                
-              localization={{ 
-                toolbar: { searchPlaceholder: 'Buscar' },
-                body: {
-                    emptyDataSourceMessage: 'No hay resultados',
-                    filterRow: {
-                        filterTooltip: 'Filter'
-                    }
-                },
-                header:{
-                  actions:''
-                } 
-                }}
-
-                actions={[
-                  {
-                    icon: tableIcons.Edit,
-                    tooltip: 'Editar mantenimiento',
-                    onClick: (event, rowData) => {
-                      
-                      dispatch({type: 'editar'})
-                      dispatch({ type: 'mantenimiento', payload: rowData });
-
-                    }
+      <Grid container style={{backgroundColor:'whitesmoke', width:'50%', float: 'right', height: '100vh'}}>
+        <div className="mantenimientos">
+          <div className="mantenimientos__encabezado">
+            <Grid container justify='flex-end'>
+              <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Nuevo mantenimiento</Button>
+            </Grid>
+            
+            <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
+              { mantenimientos && !!mantenimientos.length && !isLoading && <MaterialTable
+                icons={tableIcons}
+                columns={columns}
+                data={mantenimientos}
+                stickyHeader
+                title="Gestionar mantenimientos"
+                style={{padding: '3vh', width:'100%', height:'auto'}}
+                options={{
+                  search: false,
+                  searchFieldAlignment:'left',
+                  defaultGroupOrder:'0',
+                  pageSize: 10,
+                  actionsColumnIndex: -1,
+                  rowStyle:{backgroundColor:'whitesmoke',
+                  emptyRowsWhenPaging: true,}}
+                  }
+                  
+                localization={{ 
+                  toolbar: { searchPlaceholder: 'Buscar' },
+                  body: {
+                      emptyDataSourceMessage: 'No hay resultados',
+                      filterRow: {
+                          filterTooltip: 'Filter'
+                      }
                   },
-                ]}
-                
-            /> }
-            {console.log(mantenimientos)}
-            {isLoading && <Grid> Cargando mantenimientos ...</Grid>} 
-          </Grid>
+                  header:{
+                    actions:''
+                  } 
+                  }}
 
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-          >
-           <FormularioEntidad title="Nuevo vehículo" fields={fields} model={null} onChange={handleChange} onSubmit={handleSubmit} /> 
-          </Modal>
-          <Modal
-            open={editar}
-            onClose={()=> dispatch({ type: 'noEditar'})}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-          >
-          <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-            { mantenimiento && <FormularioEntidad title="Editar vehículo" fields={fields} model={mantenimiento} onChange={handleChange} onSubmit={editarVehiculo} /> }
-          </Grid>
-          </Modal>
+                  actions={[
+                    {
+                      icon: tableIcons.Edit,
+                      tooltip: 'Editar mantenimiento',
+                      onClick: (event, rowData) => {
+                        
+                        dispatch({type: 'editar'})
+                        dispatch({ type: 'mantenimiento', payload: rowData });
+
+                      }
+                    },
+                  ]}
+                  
+              /> || mantenimientos.length === 0 && <h2 style={{textAlign: 'center', width: '100%', marginTop: '3rem'}}>Historial vacío</h2> }
+              {console.log(mantenimientos)}
+              {isLoading && <Grid> Cargando mantenimientos ...</Grid>} 
+            </Grid>
+
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="simple-modal-title"
+              aria-describedby="simple-modal-description"
+            >
+            <FormularioEntidad title="Nuevo mantenimiento" fields={fields} model={null} onChange={handleChange} onSubmit={handleSubmit} /> 
+            </Modal>
+            <Modal
+              open={editar}
+              onClose={()=> dispatch({ type: 'noEditar'})}
+              aria-labelledby="simple-modal-title"
+              aria-describedby="simple-modal-description"
+            >
+            <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
+              { mantenimiento && <FormularioEntidad title="Editar vehículo" fields={fields} model={mantenimiento} onChange={handleChange} onSubmit={editarMantenimiento} /> }
+            </Grid>
+            </Modal>
+          </div>
         </div>
-      </div>
-    </Grid>
+      </Grid>
     );
 }
 
-export default Vehiculos;
+export default Mantenimientos;

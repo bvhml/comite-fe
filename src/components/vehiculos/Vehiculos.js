@@ -2,6 +2,7 @@ import React, { useState, useEffect, forwardRef, useReducer } from 'react';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
 import VehiculoHelperMethods from '../../helpers/VehiculoHelperMethods';
+import Manteimientos from './MantenimientoVehiculo'
 import { Grid, Button, Modal } from '@material-ui/core';
 import axios from 'axios';
 import MaterialTable from 'material-table';
@@ -53,7 +54,10 @@ import { useHistory } from 'react-router-dom';
         return {
           ...state,
           error: false,
-          vehiculo: {...state.vehiculo,[action.fieldName]:action.payload},
+          vehiculo: {
+            ...state.vehiculo,
+            [action.fieldName]:action.payload
+          },
         };
       }
       case 'load': {
@@ -109,10 +113,22 @@ import { useHistory } from 'react-router-dom';
           editar: true,
         };
       }
+      case 'side': {
+        return {
+          ...state,
+          side: true,
+        };
+      }
       case 'noEditar': {
         return {
           ...state,
           editar: false,
+        };
+      }
+      case 'noSide': {
+        return {
+          ...state,
+          side: false,
         };
       }
       default:
@@ -129,6 +145,7 @@ import { useHistory } from 'react-router-dom';
     isLoggedIn: false,
     open: false,
     editar: false,
+    side: false
   };
 
 const Vehiculos = ({ classes, mobile }) => {
@@ -136,7 +153,7 @@ const Vehiculos = ({ classes, mobile }) => {
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
 
   const [state, dispatch] = useReducer(vehiculosReducer, initialState);
-  const { vehiculos, vehiculo, isLoading, open, editar, error, showError } = state;
+  const { vehiculos, vehiculo, isLoading, open, editar, error, showError, side } = state;
   const history = useHistory();
 
   let fields = [{ 
@@ -374,7 +391,6 @@ const Vehiculos = ({ classes, mobile }) => {
           </Grid>
 
           <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
-            {console.log(vehiculos)}
             { vehiculos && (vehiculos.length > 0) && !isLoading && <MaterialTable
               icons={tableIcons}
               columns={columns}
@@ -410,7 +426,8 @@ const Vehiculos = ({ classes, mobile }) => {
                     icon: tableIcons.BuildIcon,
                     tooltip: 'Mantenimiento de vehiculo',
                     onClick: (event, rowData) => {
-                      history.push(`/home/mantenimiento-vehiculo/${rowData.id}`)
+                      dispatch({type: 'side'})
+                      //history.push(`/home/mantenimiento-vehiculo/${rowData.id}`)
                     }
                   },
                   {
@@ -454,6 +471,10 @@ const Vehiculos = ({ classes, mobile }) => {
           <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
             { vehiculo && <FormularioEntidad title="Editar vehículo" fields={fields} model={vehiculo} onChange={handleChange} onSubmit={editarVehiculo} /> }
           </Grid>
+          </Modal>
+
+          <Modal open={side} onClose={()=> dispatch({ type: 'noSide'})}>
+            <Manteimientos />
           </Modal>
         </div>
       </div>
