@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef, useReducer } from 'react';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
 import VehiculoHelperMethods from '../../helpers/VehiculoHelperMethods';
-import Manteimientos from './MantenimientoVehiculo'
+import Mantenimientos from './MantenimientoVehiculo'
 import { Grid, Button, Modal } from '@material-ui/core';
 import axios from 'axios';
 import MaterialTable from 'material-table';
@@ -46,7 +46,7 @@ import { useHistory } from 'react-router-dom';
       ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
       ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
       BuildIcon: forwardRef((props, ref) =><BuildOutlinedIcon {...props} ref={ref}/>)
-    };
+  };
 
   function vehiculosReducer(state, action) {
     switch (action.type) {
@@ -427,6 +427,7 @@ const Vehiculos = ({ classes, mobile }) => {
                     tooltip: 'Mantenimiento de vehiculo',
                     onClick: (event, rowData) => {
                       dispatch({type: 'side'})
+                      dispatch({ type: 'vehiculo', payload: rowData });
                       //history.push(`/home/mantenimiento-vehiculo/${rowData.id}`)
                     }
                   },
@@ -474,7 +475,7 @@ const Vehiculos = ({ classes, mobile }) => {
           </Modal>
 
           <Modal open={side} onClose={()=> dispatch({ type: 'noSide'})}>
-            <Manteimientos />
+            {side && vehiculo && <Mantenimientos vehiculoId={vehiculo.id}/>}
           </Modal>
         </div>
       </div>

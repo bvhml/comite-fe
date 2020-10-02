@@ -131,13 +131,12 @@ import { useParams } from 'react-router-dom';
     editar: false,
   };
 
-const Mantenimientos = ({ classes, mobile }) => {
+const Mantenimientos = ({ vehiculoId }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
 
   const [state, dispatch] = useReducer(vehiculosReducer, initialState);
   const { mantenimientos, mantenimiento, isLoading, open, editar, error, showError } = state;
-  let { entidad } = useParams();
 
 
   let fields = [{ 
@@ -191,7 +190,7 @@ const Mantenimientos = ({ classes, mobile }) => {
     let signal = axios.CancelToken.source();
     const getMantenimientos = async (idVehiculo)=>{
 
-      if (entidad){
+      if (idVehiculo){
         const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
         try {
           dispatch({ type: 'load' });
@@ -206,9 +205,9 @@ const Mantenimientos = ({ classes, mobile }) => {
         }  
       }
     }
-    getMantenimientos(entidad);
+    getMantenimientos(vehiculoId);
     return ()=>{signal.cancel('Api is being canceled');}
-  },[entidad]);
+  },[vehiculoId]);
 
   const handleOpen = () => {
     dispatch({ type: 'showModal' });
@@ -262,7 +261,7 @@ const Mantenimientos = ({ classes, mobile }) => {
       
       try {
         dispatch({ type: 'load' });
-        const response = await VehiculosHelper.getMantenimientos(entidad)
+        const response = await VehiculosHelper.getMantenimientos(vehiculoId)
         if (response) {
           dispatch({ type: 'mantenimientos', payload: response });
         } 
