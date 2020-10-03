@@ -2,6 +2,8 @@ import React, { useState, useEffect, forwardRef, useReducer } from 'react';
 import validator from 'validator';
 import FormularioEntidad from '../forms/FormularioEntidad'
 import VehiculoHelperMethods from '../../helpers/VehiculoHelperMethods';
+import UserHelperMethods from '../../helpers/UserHelperMethods';
+
 import Mantenimientos from './MantenimientoVehiculo'
 import { Grid, Button, Modal } from '@material-ui/core';
 import axios from 'axios';
@@ -151,12 +153,12 @@ import { useHistory } from 'react-router-dom';
 const Vehiculos = ({ classes, mobile }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
+  const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
 
   const [state, dispatch] = useReducer(vehiculosReducer, initialState);
   const { vehiculos, vehiculo, isLoading, open, editar, error, showError, side } = state;
   const history = useHistory();
-
-  let fields = [{ 
+  const [fields, setFields] = useState([{ 
     label: 'Marca',
     columnSize: '30%',
     field: 'marca',
@@ -262,7 +264,16 @@ const Vehiculos = ({ classes, mobile }) => {
     message: 'Ingrese un color',
     error: false,
     type: 'text'
-  }];
+  }, { 
+    label: 'Piloto',
+    columnSize: '100%',
+    field: 'transmision',
+    validWhen: false,
+    message: 'Seleccione un piloto',
+    error: false,
+    type: 'select',
+    options: []
+  }]);
   
   let columns= [
     { 
@@ -291,23 +302,49 @@ const Vehiculos = ({ classes, mobile }) => {
     },
   ];
 
+  const getTodosVehiculos = async (signal)=>{
+    try {
+      dispatch({ type: 'load' });
+      const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
+      if (response) {
+        dispatch({ type: 'vehiculos', payload: response });
+      } 
+    } catch (error) {
+        if (axios.isCancel(error)) {
+          //console.log('Error: ', error.message); // => prints: Api is being canceled
+      }
+    }  
+  }
+
+  const getPilotos = async (signal) => {
+    try {
+      const response = await UsuariosHelper.buscarPilotos(signal.token)
+      if (response) {
+        const pilotos = response.map(res => {
+          return {
+            label: res.nombre,
+            value: res.id
+          }
+        })
+        fields.forEach(field => {
+          if(field.label === 'Piloto') {
+            field.options = pilotos;
+          }
+        });
+        setFields(fields);
+
+      } 
+    } catch (error) {
+        if (axios.isCancel(error)) {
+          //console.log('Error: ', error.message); // => prints: Api is being canceled
+      }
+    }  
+  }
+
   useEffect(() =>{
     let signal = axios.CancelToken.source();
-    const getTodosVehiculos = async ()=>{
-      const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      try {
-        dispatch({ type: 'load' });
-        const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
-        if (response) {
-          dispatch({ type: 'vehiculos', payload: response });
-        } 
-      } catch (error) {
-          if (axios.isCancel(error)) {
-            //console.log('Error: ', error.message); // => prints: Api is being canceled
-        }
-      }  
-    }
-    getTodosVehiculos();
+    getTodosVehiculos(signal);
+    getPilotos(signal);
     return ()=>{signal.cancel('Api is being canceled');}
   },[]);
 

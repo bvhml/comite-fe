@@ -236,7 +236,8 @@ const Usuarios = ({ classes, mobile }) => {
       }  
     }
     getTodosUsuarios();
-    return ()=>{signal.cancel('Api is being canceled');}
+    return ()=>{
+      signal.cancel('Api is being canceled');}
   },[]);
 
   const handleOpen = () => {

@@ -58,4 +58,9 @@ export default class UserHelperMethods {
             return error;
         }
     }
+
+    buscarPilotos = async cancelToken => {
+        const usuarios = await this.buscarUsuarios(cancelToken);
+        return usuarios.filter(usuario => usuario.rol === 1);
+    }
 }
