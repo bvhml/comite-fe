@@ -59,6 +59,11 @@ export default class UserHelperMethods {
         }
     }
 
+    buscarUsuarioById = async (userId, cancelToken) => {
+        const usuarios = await this.buscarUsuarios(cancelToken);
+        return usuarios.filter(usuario => usuario.id === userId)[0];
+    }
+
     buscarPilotos = async cancelToken => {
         const usuarios = await this.buscarUsuarios(cancelToken);
         return usuarios.filter(usuario => usuario.rol === 1);

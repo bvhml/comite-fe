@@ -1,53 +1,84 @@
 import React from 'react';
 
-import { Button } from '@material-ui/core';
+import { Button, Input, FormControl, InputLabel } from '@material-ui/core';
+import { withFormik, Field, Form } from 'formik'
+import SelectEntidad from './SelectEntidad'
 
 import './forms.scss';
-import InputEntidad from './InputEntidad';
-import SelectEntidad from './SelectEntidad';
-import TextAreaEntidad from './TextAreaEntidad'
 
-const FormularioEntidad = ({ title, fields, model, onChange, onSubmit }) => {
+const FormularioEntidad = ({ title, fields, options }) => {
 
     return (
         <div className="formulario-entidad">
-            <h1 className="formulario-entidad__titulo">{ title }</h1>
-            <form noValidate autoComplete="off" onSubmit={onSubmit}>
-                {
-                    fields.map(field => {
-                        switch(field.type) {
-                            case 'select':
-                                return <SelectEntidad
-                                            model={model} 
-                                            field={field.field}
-                                            columnSize={field.columnSize} 
-                                            options={field.options}
-                                            label={field.label} 
-                                            handleChange={onChange} />
-                            case 'textarea':
-                                return <TextAreaEntidad 
-                                            model={model} 
-                                            field={field.field} 
-                                            type={field.type} 
-                                            columnSize={field.columnSize} 
-                                            label={field.label} 
-                                            handleChange={onChange} />
-                            default:                                
-                                return <InputEntidad 
-                                            model={model} 
-                                            field={field.field} 
-                                            type={field.type} 
-                                            columnSize={field.columnSize} 
-                                            label={field.label} 
-                                            handleChange={onChange} />
-                        }
-                         
-                    })
-                }                
-                <Button type="submit" className="formulario-entidad__boton-ingresar" variant="contained">Ingresar</Button>
-            </form>            
+            <div className="formulario-entidad__wrapper">
+                <h1 className="formulario-entidad__titulo">{ title }</h1>
+                <Form>
+                    {
+                        fields && fields.map(fieldItem => {
+                            switch(fieldItem.type) {
+                                case 'select':
+                                    return (
+                                        <Field name={fieldItem.field}>
+                                            {({ field, meta }) => <SelectEntidad field={field} meta={meta} fieldItem={fieldItem} options={options} />}
+                                        </Field>
+                                    );
+                                default:                                
+                                    return (
+                                            <Field name={fieldItem.field}>
+                                                {
+                                                    ({ field, meta }) => (
+                                                        <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
+                                                            <FormControl fullWidth={true} margin="dense">
+                                                                <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
+                                                                <Input className="formulario-entidad__input" type="text" {...field} />
+                                                                { meta.touched && meta.error && <div className="error">{meta.error}</div> }
+                                                            </FormControl>
+                                                        </div>
+                                                    )
+                                                }
+                                            </Field>
+                                    );
+                            }
+                            
+                        })
+                    }                
+                    <Button type="submit" className="formulario-entidad__boton-ingresar" variant="contained">Ingresar</Button>
+                </Form>
+            </div>                        
         </div>
     );
 }
 
-export default FormularioEntidad;
+const fieldsArrayToObject = (fieldsArray) => {
+    return fieldsArray && fieldsArray.reduce((fieldsObject, fieldItem) => {
+        return { ...fieldsObject, [fieldItem.field]: ''}
+    }, {})
+}
+
+export default withFormik({
+
+    mapPropsToValues({ model, fields }) {
+        if(model){
+            return model;
+        }
+        return fieldsArrayToObject(fields);
+    },
+
+    validate(values) {
+        const errors = {};
+
+        Object.keys(values).forEach(key => {
+            if(!values[key]){
+                errors[key] = 'Este campo es requerido'
+            }
+        });
+
+        return errors;
+    },
+
+    handleSubmit(values, { props, setSubmitting }) {
+        props.onSubmit(values);
+        setSubmitting(false);
+    }
+
+})(FormularioEntidad);

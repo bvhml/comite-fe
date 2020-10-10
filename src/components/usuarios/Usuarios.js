@@ -9,6 +9,7 @@ import MaterialTable from 'material-table';
 import './usuarios.scss';
 
 import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, FilterList, FirstPage, LastPage, Remove, SaveAlt, Search, ViewColumn } from '@material-ui/icons';
+import { getRoleText, rolesEnum } from '../../enums/RolesEnum';
 
 
   const tableIcons = {
@@ -131,17 +132,17 @@ const Usuarios = ({ classes, mobile }) => {
     error: false,
     type: 'select',
     options: [{
-      label: 'Piloto',
-      value: 1
+      label: getRoleText(rolesEnum.PILOTO),
+      value: rolesEnum.PILOTO
     }, {
-      label: 'Solicitante',
-      value: 2
+      label: getRoleText(rolesEnum.SOLICITANTE),
+      value: rolesEnum.SOLICITANTE
     }, {
-      label: 'Administrador',
-      value: 3
+      label: getRoleText(rolesEnum.ADMINISTRADOR),
+      value: rolesEnum.ADMINISTRADOR
     }, {
-      label: 'Director',
-      value: 4
+      label: getRoleText(rolesEnum.DIRECTOR),
+      value: rolesEnum.DIRECTOR
     }]
   }, {
     label: 'Nombres',
@@ -198,7 +199,7 @@ const Usuarios = ({ classes, mobile }) => {
       title: 'Rol', 
       field: 'rol',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rol}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{getRoleText(rowData.rol)}</div>
     },
     { 
       title: 'Nombres', 
@@ -257,25 +258,14 @@ const Usuarios = ({ classes, mobile }) => {
     });
   }
 
-  const handleSubmit = event => {
-      event.preventDefault();
-      validateForm();
-      if(!error){
-          enviarUsuario()
-      }
-  }
-
-  const validateForm = () => {
-    fields.forEach(field => {
-      if(!error && !usuario[field.field]) {
-        dispatch({ type: 'error' });
-      }
-    });
+  const handleSubmit = usuario => {
+      dispatch({ type: 'usuario', payload: usuario });
+      enviarUsuario();
   }
 
   const enviarUsuario = async () => {
     try {
-      let saveResponse = await UsuariosHelper.guardarUsuario(usuario);
+      await UsuariosHelper.guardarUsuario(usuario);
       usuarios.push(usuario);
       dispatch({ type: 'usuarios', payload: usuarios });
       handleClose();
@@ -285,10 +275,10 @@ const Usuarios = ({ classes, mobile }) => {
     } 
   }
 
-  const editarUsuario = async () => {
+  const editarUsuario = async usuario => {
     try {
-      let saveResponse = await UsuariosHelper.guardarUsuario(usuario);
       let signal = axios.CancelToken.source();
+      await UsuariosHelper.guardarUsuario(usuario);
       
       try {
         dispatch({ type: 'load' });
@@ -380,7 +370,7 @@ const Usuarios = ({ classes, mobile }) => {
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
           >
-           <FormularioEntidad type="usuarios" fields={fields} onChange={handleChange} onSubmit={handleSubmit} /> 
+           <FormularioEntidad title="Nuevo usuario" fields={fields} model={null} onChange={handleChange} onSubmit={handleSubmit} /> 
           </Modal>
           <Modal
             open={editar}
@@ -389,70 +379,7 @@ const Usuarios = ({ classes, mobile }) => {
             aria-describedby="simple-modal-description"
           >
           <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-            {usuario && <form noValidate autoComplete="off" spacing={2} >
-              <TextField
-                id="rol"
-                label='Rol'
-                value={usuario.rol || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="nombre"
-                label='Nombres'
-                value={usuario.nombre || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="apellido"
-                label='Apellidos'
-                value={usuario.apellido || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="edad"
-                label='Edad'
-                value={usuario.edad || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="dpi"
-                label='DPI'
-                value={usuario.dpi || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="username"
-                label='Correo electrónico'
-                value={usuario.username || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <TextField
-                id="password"
-                label='Contraseña'
-                value={usuario.password || ''}
-                variant='standard'
-                style={{paddingLeft:'1rem'}}
-                onChange={handleChange}
-              />
-              <Button onClick={()=> dispatch({type:'noEditar'})} style={{backgroundColor: '#e04046',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
-                Cancelar
-              </Button>
-              <Button onClick={editarUsuario} style={{backgroundColor: 'green',color: '#ffffff',float: 'right',marginTop: '1rem',marginRight: '1rem'}}>
-                Guardar
-              </Button>
-            </form>}
+            { usuario && <FormularioEntidad  title="Editar usuario" fields={fields} model={usuario} onChange={handleChange} onSubmit={editarUsuario} /> }
           </Grid>
           </Modal>
         </div>

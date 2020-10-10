@@ -267,7 +267,7 @@ const Vehiculos = ({ classes, mobile }) => {
   }, { 
     label: 'Piloto',
     columnSize: '100%',
-    field: 'transmision',
+    field: 'piloto',
     validWhen: false,
     message: 'Seleccione un piloto',
     error: false,
@@ -280,7 +280,7 @@ const Vehiculos = ({ classes, mobile }) => {
       title: 'Piloto Asignado', 
       field: 'piloto',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.piloto}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombrePiloto}</div>
     },
     { 
       title: 'Vehículo', 
@@ -307,6 +307,15 @@ const Vehiculos = ({ classes, mobile }) => {
       dispatch({ type: 'load' });
       const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
       if (response) {
+        await response.forEach(async vehiculo => {
+          if(vehiculo.piloto){
+            const response = await UsuariosHelper.buscarUsuarioById(vehiculo.piloto, signal.token)
+            vehiculo.nombrePiloto = response.nombre;
+          } else {
+            vehiculo.nombrePiloto = 'No aplica';
+          }
+          
+        });
         dispatch({ type: 'vehiculos', payload: response });
       } 
     } catch (error) {
@@ -365,20 +374,9 @@ const Vehiculos = ({ classes, mobile }) => {
     })
   }
 
-  const handleSubmit = event => {
-      event.preventDefault();
-      validateForm();
-      if(!error){
-          enviarVehiculo()
-      }
-  }
-
-  const validateForm = () => {
-    fields.forEach(field => {
-      if(!error && !vehiculo[field.field]) {
-        dispatch({ type: 'error' });
-      }
-    });
+  const handleSubmit = vehiculo => {
+    dispatch({ type: 'vehiculo', payload: vehiculo })
+    enviarVehiculo();
   }
 
   const enviarVehiculo = async () => {
@@ -393,11 +391,10 @@ const Vehiculos = ({ classes, mobile }) => {
     } 
   }
 
-  const editarVehiculo = async (event) => {
-    event.preventDefault();
+  const editarVehiculo = async (vehiculo) => {
     try {
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
+      await VehiculosHelper.guardarVehiculo(vehiculo);
       let signal = axios.CancelToken.source();
       
       try {
