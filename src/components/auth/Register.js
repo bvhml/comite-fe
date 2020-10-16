@@ -119,7 +119,7 @@ const Register = ({classes,mobile}) =>{
     
 
     if (validation.isValid) {
-      Auth.signUp(email, password,nombre,apellido)
+      Auth.signUp({email, password,nombre,apellido})
         .then(res => {
           if (res.status === 400) {
             setState(state => ({

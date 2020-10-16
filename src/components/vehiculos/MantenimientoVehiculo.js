@@ -131,7 +131,7 @@ import { useParams } from 'react-router-dom';
     editar: false,
   };
 
-const Mantenimientos = ({ vehiculoId }) => {
+const Mantenimientos = ({ entityId }) => {
 
   const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
 
@@ -205,9 +205,9 @@ const Mantenimientos = ({ vehiculoId }) => {
         }  
       }
     }
-    getMantenimientos(vehiculoId);
+    getMantenimientos(entityId);
     return ()=>{signal.cancel('Api is being canceled');}
-  },[vehiculoId]);
+  },[entityId]);
 
   const handleOpen = () => {
     dispatch({ type: 'showModal' });
@@ -261,7 +261,7 @@ const Mantenimientos = ({ vehiculoId }) => {
       
       try {
         dispatch({ type: 'load' });
-        const response = await VehiculosHelper.getMantenimientos(vehiculoId)
+        const response = await VehiculosHelper.getMantenimientos(entityId)
         if (response) {
           dispatch({ type: 'mantenimientos', payload: response });
         } 

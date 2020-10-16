@@ -24,19 +24,19 @@ const FormularioEntidad = ({ title, fields, options }) => {
                                     );
                                 default:                                
                                     return (
-                                            <Field name={fieldItem.field}>
-                                                {
-                                                    ({ field, meta }) => (
-                                                        <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
-                                                            <FormControl fullWidth={true} margin="dense">
-                                                                <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
-                                                                <Input className="formulario-entidad__input" type="text" {...field} />
-                                                                { meta.touched && meta.error && <div className="error">{meta.error}</div> }
-                                                            </FormControl>
-                                                        </div>
-                                                    )
-                                                }
-                                            </Field>
+                                        <Field name={fieldItem.field}>
+                                            {
+                                                ({ field, meta }) => (
+                                                    <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
+                                                        <FormControl fullWidth={true} margin="dense">
+                                                            <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
+                                                            <Input className="formulario-entidad__input" type="text" {...field} />
+                                                            { meta.touched && meta.error && <div className="error">{meta.error}</div> }
+                                                        </FormControl>
+                                                    </div>
+                                                )
+                                            }
+                                        </Field>
                                     );
                             }
                             

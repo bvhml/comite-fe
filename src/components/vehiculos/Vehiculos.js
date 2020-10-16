@@ -27,7 +27,8 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import BuildOutlinedIcon from '@material-ui/icons/BuildOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import { useHistory } from 'react-router-dom';
+import VehiculosReducer from '../../reducers/VehiculosReducer';
+import TablaEntidad from '../forms/TablaEntidad';
 
   const tableIcons = {
       Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -50,94 +51,11 @@ import { useHistory } from 'react-router-dom';
       BuildIcon: forwardRef((props, ref) =><BuildOutlinedIcon {...props} ref={ref}/>)
   };
 
-  function vehiculosReducer(state, action) {
-    switch (action.type) {
-      case 'field': {
-        return {
-          ...state,
-          error: false,
-          vehiculo: {
-            ...state.vehiculo,
-            [action.fieldName]:action.payload
-          },
-        };
-      }
-      case 'load': {
-        return {
-          ...state,
-          error: '',
-          isLoading: true,
-        };
-      }
-      case 'vehiculos': {
-        return {
-          ...state,
-          vehiculos: action.payload,
-          isLoading: false,
-        };
-      }
-      case 'vehiculo': {
-        return {
-          ...state,
-          vehiculo: action.payload,
-          isLoading: false,
-        };
-      }
-      case 'error': {
-        return {
-          ...state,
-          error: true,
-          showError: true,
-          isLoading: false,
-        };
-      }
-      case 'logOut': {
-        return {
-          ...state,
-          isLoggedIn: false,
-        };
-      }
-      case 'hideModal': {
-        return {
-          ...state,
-          open: false,
-        };
-      }
-      case 'showModal': {
-        return {
-          ...state,
-          open: true,
-        };
-      }
-      case 'editar': {
-        return {
-          ...state,
-          editar: true,
-        };
-      }
-      case 'side': {
-        return {
-          ...state,
-          side: true,
-        };
-      }
-      case 'noEditar': {
-        return {
-          ...state,
-          editar: false,
-        };
-      }
-      case 'noSide': {
-        return {
-          ...state,
-          side: false,
-        };
-      }
-      default:
-        return state;
-    }
-  }
-  
+const Vehiculos = ({ classes, mobile }) => {
+
+  const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
+  const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
+
   const initialState = {
     vehiculos: [],
     vehiculo: null,
@@ -150,14 +68,9 @@ import { useHistory } from 'react-router-dom';
     side: false
   };
 
-const Vehiculos = ({ classes, mobile }) => {
-
-  const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP);
-  const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
-
-  const [state, dispatch] = useReducer(vehiculosReducer, initialState);
-  const { vehiculos, vehiculo, isLoading, open, editar, error, showError, side } = state;
-  const history = useHistory();
+  const [state, dispatch] = useReducer(VehiculosReducer, initialState);
+  const { entity } = state;
+  const [ vehiculos, setVehiculos ] = useState([])
   const [fields, setFields] = useState([{ 
     label: 'Marca',
     columnSize: '30%',
@@ -302,25 +215,28 @@ const Vehiculos = ({ classes, mobile }) => {
     },
   ];
 
+  const mapPilotoToVehiculo = async (vehiculos, signal) => {
+    vehiculos.forEach(async vehiculo => {
+      if(vehiculo.piloto){
+        const response = await UsuariosHelper.buscarUsuarioById(vehiculo.piloto, signal.token)
+        vehiculo.nombrePiloto = response.nombre;
+      } else {
+        vehiculo.nombrePiloto = 'No aplica';
+      }      
+    });
+  }
+
   const getTodosVehiculos = async (signal)=>{
     try {
       dispatch({ type: 'load' });
       const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
       if (response) {
-        await response.forEach(async vehiculo => {
-          if(vehiculo.piloto){
-            const response = await UsuariosHelper.buscarUsuarioById(vehiculo.piloto, signal.token)
-            vehiculo.nombrePiloto = response.nombre;
-          } else {
-            vehiculo.nombrePiloto = 'No aplica';
-          }
-          
-        });
-        dispatch({ type: 'vehiculos', payload: response });
+        await mapPilotoToVehiculo(response, signal);
+        setVehiculos(response);
       } 
     } catch (error) {
         if (axios.isCancel(error)) {
-          //console.log('Error: ', error.message); // => prints: Api is being canceled
+          console.log('Error: ', error.message); // => prints: Api is being canceled
       }
     }  
   }
@@ -356,14 +272,6 @@ const Vehiculos = ({ classes, mobile }) => {
     getPilotos(signal);
     return ()=>{signal.cancel('Api is being canceled');}
   },[]);
-
-  const handleOpen = () => {
-    dispatch({ type: 'showModal' });
-  };
-
-  const handleClose = () => {
-    dispatch({ type: 'hideModal' });
-  };
   
   const handleChange = event => {
     event.preventDefault();
@@ -374,17 +282,11 @@ const Vehiculos = ({ classes, mobile }) => {
     })
   }
 
-  const handleSubmit = vehiculo => {
-    dispatch({ type: 'vehiculo', payload: vehiculo })
-    enviarVehiculo();
-  }
-
   const enviarVehiculo = async () => {
     try {
-      let saveResponse = await VehiculosHelper.guardarVehiculo(vehiculo);
-      vehiculos.push(vehiculo);
+      let saveResponse = await VehiculosHelper.guardarVehiculo(entity);
+      vehiculos.push(entity);
       dispatch({ type: 'vehiculos', payload: vehiculos });
-      handleClose();
     }
     catch (error) {
       console.log(error);
@@ -417,103 +319,20 @@ const Vehiculos = ({ classes, mobile }) => {
   }
 
     return (
-    <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
-      <div className="vehiculos">
-        <div className="vehiculos__encabezado">
-          <Grid container justify='flex-end'>
-            <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar vehículo</Button>
-          </Grid>
-
-          <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
-            { vehiculos && (vehiculos.length > 0) && !isLoading && <MaterialTable
-              icons={tableIcons}
-              columns={columns}
-              data={vehiculos}
-              stickyHeader
-              title="Gestionar Vehiculos"
-              style={{padding: '3vh', width:'100%', height:'auto'}}
-              options={{
-                search: false,
-                searchFieldAlignment:'left',
-                defaultGroupOrder:'0',
-                pageSize: 10,
-                actionsColumnIndex: -1,
-                rowStyle:{backgroundColor:'whitesmoke',
-                emptyRowsWhenPaging: true,}}
-                }
-                
-              localization={{ 
-                toolbar: { searchPlaceholder: 'Buscar' },
-                body: {
-                    emptyDataSourceMessage: 'No hay resultados',
-                    filterRow: {
-                        filterTooltip: 'Filter'
-                    }
-                },
-                header:{
-                  actions:''
-                } 
-                }}
-
-                actions={[
-                  {
-                    icon: tableIcons.BuildIcon,
-                    tooltip: 'Mantenimiento de vehiculo',
-                    onClick: (event, rowData) => {
-                      dispatch({type: 'side'})
-                      dispatch({ type: 'vehiculo', payload: rowData });
-                      //history.push(`/home/mantenimiento-vehiculo/${rowData.id}`)
-                    }
-                  },
-                  {
-                    icon: tableIcons.Edit,
-                    tooltip: 'Editar vehiculo',
-                    onClick: (event, rowData) => {
-                      
-                      dispatch({type: 'editar'})
-                      dispatch({ type: 'vehiculo', payload: rowData });
-
-                    }
-                  },
-                  {
-                    icon: tableIcons.Delete,
-                    tooltip: 'Eliminar vehiculo',
-                    onClick: (event, rowData) => {
-                      
-                    }
-                  },
-                ]}
-                
-            />}
-
-            {isLoading && <Grid> Cargando vehiculos ...</Grid>} 
-          </Grid>
-
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-          >
-           <FormularioEntidad title="Nuevo vehículo" fields={fields} model={null} onChange={handleChange} onSubmit={handleSubmit} /> 
-          </Modal>
-          <Modal
-            open={editar}
-            onClose={()=> dispatch({ type: 'noEditar'})}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-          >
-          <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-            { vehiculo && <FormularioEntidad title="Editar vehículo" fields={fields} model={vehiculo} onChange={handleChange} onSubmit={editarVehiculo} /> }
-          </Grid>
-          </Modal>
-
-          <Modal open={side} onClose={()=> dispatch({ type: 'noSide'})}>
-            {side && vehiculo && <Mantenimientos vehiculoId={vehiculo.id}/>}
-          </Modal>
-        </div>
-      </div>
-    </Grid>
+      <TablaEntidad
+        entitiesList={vehiculos}
+        onCreate={enviarVehiculo}
+        onEdit={editarVehiculo}
+        onDelete={null} 
+        onFieldChange={handleChange} 
+        formFields={fields}
+        columns={columns}
+        reducer={VehiculosReducer}
+        initialState={initialState}
+        entitiesListName="vehículos"
+        entityName="vehículo"
+        sideModalComponentRender={props => <Mantenimientos {...props}/> }
+      />
     );
 }
 
