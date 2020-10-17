@@ -1,15 +1,18 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import MaterialTable from 'material-table';
 import { Grid, Button, Modal } from '@material-ui/core';
 import tableIcons from './../../utils/TableIcons';
 import FormularioEntidad from '../forms/FormularioEntidad';
 
+import './forms.scss';
 
-const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, onFieldChange, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender }) => {
+
+const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enebaleMaintenance }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { entity, isLoading, open, editar, error, showError, side } = state;
+    const { entity, isLoading, open, editar, side } = state;
+    const [actions, setActions] = useState([]);
 
     // Methods
     const handleOpen = () => {
@@ -20,23 +23,56 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, onFieldChange,
         dispatch({ type: 'hideModal' });
     };
 
-    const handleCreate = entity => {
-        dispatch({ type: 'entity', payload: entity });
-        onCreate(entity)
+    const handleCreate = async entity => {
+        await onCreate(entity)
         handleClose();
     }
 
-    const handleEdit = entity => {
-        onEdit(entity);
-        handleClose();
+    const handleEdit = async entity => {
+        await onEdit(entity);
+        dispatch({ type: 'noEditar'})
     }
+
+    // Lifecycle
+    useEffect(() => {
+        if(enebaleMaintenance) {
+            actions.push({
+                icon: tableIcons.BuildIcon,
+                tooltip: 'Mantenimiento de vehiculo',
+                onClick: (event, rowData) => {
+                    dispatch({ type: 'entity', payload: rowData });
+                    dispatch({type: 'side'})
+                }
+            });
+        }
+
+        if(enableEdit) {
+            actions.push({
+                icon: tableIcons.Edit,
+                tooltip: 'Editar vehiculo',
+                onClick: (event, rowData) => {                                
+                    dispatch({type: 'editar'})
+                    dispatch({ type: 'entity', payload: rowData });
+                }
+            });
+        }
+
+        if(enableDelete) {
+            actions.push({
+                icon: tableIcons.Delete,
+                tooltip: 'Eliminar vehiculo'
+            });
+        }
+
+        setActions(actions);
+    }, []);
 
     return (
         <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
-            <div className="vehiculos">
-                <div className="vehiculos__encabezado">
+            <div className="tabla-entidad">
+                <div className="tabla-entidad__encabezado">
                     <Grid container justify='flex-end'>
-                        <Button className="vehiculos__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar {entityName}</Button>
+                        <Button className="tabla-entidad__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar {entityName}</Button>
                     </Grid>
 
                     <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
@@ -70,26 +106,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, onFieldChange,
                             } 
                             }}
 
-                            actions={[{
-                                icon: tableIcons.BuildIcon,
-                                tooltip: 'Mantenimiento de vehiculo',
-                                onClick: (event, rowData) => {
-                                    dispatch({ type: 'entity', payload: rowData });
-                                    dispatch({type: 'side'})
-                                }
-                            },
-                            {
-                                icon: tableIcons.Edit,
-                                tooltip: 'Editar vehiculo',
-                                onClick: (event, rowData) => {                                
-                                    dispatch({type: 'editar'})
-                                    dispatch({ type: 'entity', payload: rowData });
-                                }
-                            },
-                            {
-                                icon: tableIcons.Delete,
-                                tooltip: 'Eliminar vehiculo'
-                            }]}
+                            actions={actions}
                             
                         />}
 
@@ -102,7 +119,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, onFieldChange,
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
                     >
-                        <FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onChange={onFieldChange} onSubmit={handleCreate} /> 
+                        <FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} /> 
                     </Modal>
                     <Modal
                         open={editar}
@@ -111,7 +128,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, onFieldChange,
                         aria-describedby="simple-modal-description"
                     >
                     <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-                        { entity && <FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onChange={onFieldChange} onSubmit={handleEdit} /> }
+                        { entity && <FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /> }
                     </Grid>
                     </Modal>
 

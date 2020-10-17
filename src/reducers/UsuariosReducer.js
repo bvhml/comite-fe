@@ -1,29 +1,25 @@
-const VehiculosReducer = (state, action) => {
+const UsuariosReducer = (state, action) => {
     switch (action.type) {
       case 'field': 
         return {
           ...state,
           error: false,
-          entity: {
-            ...state.entity,
-            [action.fieldName]:action.payload
-          },
+          entity: {...state.entity, [action.fieldName]:action.payload},
         };
-      
       case 'load': 
         return {
           ...state,
           error: '',
           isLoading: true,
         };
-      
+
       case 'entity': 
         return {
           ...state,
           entity: action.payload,
           isLoading: false,
         };
-      
+
       case 'error': 
         return {
           ...state,
@@ -56,27 +52,15 @@ const VehiculosReducer = (state, action) => {
           editar: true,
         };
       
-      case 'side': 
-        return {
-          ...state,
-          side: true,
-        };
-      
       case 'noEditar': 
         return {
           ...state,
           editar: false,
         };
       
-      case 'noSide': 
-        return {
-          ...state,
-          side: false,
-        };
-      
       default:
         return state;
     }
-  }
+}
 
-  export default VehiculosReducer;
+export default UsuariosReducer;

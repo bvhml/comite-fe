@@ -21,6 +21,7 @@ import Vehiculos from '../vehiculos/Vehiculos';
 import MantenimientoVehiculo from '../vehiculos/MantenimientoVehiculo';
 
 import './inicio.css'
+import ViajeSolicitante from '../viajes/ViajesSolicitante';
 
 
 export default function PersistentDrawerLeft({ classes, mobile }) {
@@ -67,6 +68,24 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
       history.push(`/home/${option}`);
       setNavOption(option);
     }    
+  }  
+
+  const getComponent = (pagina, classes, mobile) => {
+    switch(pagina) {
+      case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
+      case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
+      case 'viaje': return usuario && getTripComponentByRole(usuario.rol)
+      case 'mantenimiento-vehiculo': return <MantenimientoVehiculo classes={classes} mobile={mobile}/>
+      default: return <Vehiculos classes={classes} mobile={mobile}/>
+    }
+  }
+
+  const getTripComponentByRole = role => {
+    switch(role) {
+      case 2: return <ViajeSolicitante />
+      case 3: return <ViajeSolicitante />
+      case 4: return <ViajeSolicitante />
+    }
   }
 
   return (
@@ -102,6 +121,14 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
           </ListItem>
           )}
 
+          {usuario &&
+          ((usuario.rol === 4 || usuario.rol === 3 || usuario.rol === 2 || true) &&
+          <ListItem button key={'Viajes'} selected={navOption === 'viaje'} onClick={()=>{selectNavOption('viaje')}}>
+            <ListItemIcon><CommuteIcon onClick={()=>{history.push('/home/viaje')}}/></ListItemIcon>
+            <ListItemText primary={'Viajes'}/>
+          </ListItem>
+          )}
+
           <ListItem button key={'Cambiar mi contraseña'} selected={navOption === 'reiniciar-contraseña'} onClick={()=>{selectNavOption('reiniciar-contraseña')}}>
             <ListItemIcon>{<VpnKeyIcon onClick={()=>{history.push('/programa')}}/>}</ListItemIcon>
             <ListItemText primary={'Cambiar mi contraseña'}/>
@@ -125,13 +152,4 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
       </main>
     </div>
   );
-}
-
-const getComponent = (pagina, classes, mobile) => {
-  switch(pagina) {
-    case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
-    case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
-    case 'mantenimiento-vehiculo': return <MantenimientoVehiculo classes={classes} mobile={mobile}/>
-    default: return <Vehiculos classes={classes} mobile={mobile}/>
-  }
 }

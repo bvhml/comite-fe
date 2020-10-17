@@ -1,6 +1,6 @@
-const VehiculosReducer = (state, action) => {
+const ViajesReducer = (state, action) => {
     switch (action.type) {
-      case 'field': 
+      case 'field': {
         return {
           ...state,
           error: false,
@@ -9,74 +9,62 @@ const VehiculosReducer = (state, action) => {
             [action.fieldName]:action.payload
           },
         };
-      
-      case 'load': 
+      }
+      case 'load': {
         return {
           ...state,
           error: '',
           isLoading: true,
         };
-      
-      case 'entity': 
+      }
+      case 'entity': {
         return {
           ...state,
           entity: action.payload,
           isLoading: false,
         };
-      
-      case 'error': 
+      }
+      case 'error': {
         return {
           ...state,
           error: true,
           showError: true,
           isLoading: false,
         };
-      
-      case 'logOut': 
+      }
+      case 'logOut': {
         return {
           ...state,
           isLoggedIn: false,
         };
-      
-      case 'hideModal': 
+      }
+      case 'hideModal': {
         return {
           ...state,
           open: false,
         };
-      
-      case 'showModal': 
+      }
+      case 'showModal': {
         return {
           ...state,
           open: true,
         };
-      
-      case 'editar': 
+      }
+      case 'editar': {
         return {
           ...state,
           editar: true,
         };
-      
-      case 'side': 
-        return {
-          ...state,
-          side: true,
-        };
-      
-      case 'noEditar': 
+      }
+      case 'noEditar': {
         return {
           ...state,
           editar: false,
         };
-      
-      case 'noSide': 
-        return {
-          ...state,
-          side: false,
-        };
-      
+      }
       default:
         return state;
     }
   }
 
-  export default VehiculosReducer;
+  export default ViajesReducer;

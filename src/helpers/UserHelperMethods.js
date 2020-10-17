@@ -59,6 +59,30 @@ export default class UserHelperMethods {
         }
     }
 
+    editarUsuario = async usuario => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ usuario })
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+            const response = await fetch(`${httpsCall}://${this.domain}/usuarios/register`, config)
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
     buscarUsuarioById = async (userId, cancelToken) => {
         const usuarios = await this.buscarUsuarios(cancelToken);
         return usuarios.filter(usuario => usuario.id === userId)[0];
