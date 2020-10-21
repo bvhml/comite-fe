@@ -7,7 +7,7 @@ import FormularioEntidad from '../forms/FormularioEntidad';
 import './forms.scss';
 
 
-const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enebaleMaintenance }) => {
+const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enebaleMaintenance, dynamicClick, resetFormStructure }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -21,6 +21,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
 
     const handleClose = () => {
         dispatch({ type: 'hideModal' });
+        resetFormStructure();
     };
 
     const handleCreate = async entity => {
@@ -102,7 +103,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                                 }
                             },
                             header:{
-                            actions:''
+                                actions:''
                             } 
                             }}
 
@@ -114,27 +115,21 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                     </Grid>
 
                     <Modal
-                        open={open}
+                        open={open || false}
                         onClose={handleClose}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
-                    >
-                        <FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} /> 
-                    </Modal>
+                        children={<div><FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} dynamicClick={dynamicClick} /></div> }
+                    />
                     <Modal
-                        open={editar}
+                        open={editar || false}
                         onClose={()=> dispatch({ type: 'noEditar'})}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
-                    >
-                    <Grid container style={{maxHeight:'85vh', position:'absolute', top:'50%', left: '50%', width:'50rem', backgroundColor:'white', transform: 'translate(-50%, -50%)', padding:'2rem'}} >
-                        { entity && <FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /> }
-                    </Grid>
-                    </Modal>
+                        children={<div><FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /></div>}
+                    />
 
-                    <Modal open={side} onClose={()=> dispatch({ type: 'noSide'})}>
-                        {side && entity && sideModalComponentRender({ entityId: entity.id }) }
-                    </Modal>
+                    <Modal open={side || false} onClose={()=> dispatch({ type: 'noSide'})} children={<div> { side && entity && sideModalComponentRender({ entityId: entity.id }) } </div>} />
                 </div>
             </div>
         </Grid>

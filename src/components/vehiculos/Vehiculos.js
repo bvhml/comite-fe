@@ -8,6 +8,7 @@ import axios from 'axios';
 import './vehiculos.scss';
 import VehiculosReducer from '../../reducers/VehiculosReducer';
 import TablaEntidad from '../forms/TablaEntidad';
+import { rolesEnum } from '../../enums/RolesEnum';
 
 const Vehiculos = () => {
 
@@ -25,15 +26,16 @@ const Vehiculos = () => {
     side: false
   };
 
-  const [ vehiculos, setVehiculos ] = useState([])
-  const [fields, setFields] = useState([{ 
+  const initialFieldsState = [{ 
     label: 'Marca',
     columnSize: '30%',
     field: 'marca',
     validWhen: false,
     message: 'Ingrese la marca',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, {
     label: 'Placa',
     columnSize: '20%',
@@ -41,7 +43,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Placa requerida',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Modelo',
     columnSize: '20%',
@@ -49,7 +53,9 @@ const Vehiculos = () => {
     validWhen: true,
     message: 'Ingrese el modelo',
     error: false,
-    type: 'text'
+    defaultValue: '',
+    type: 'text',
+    required: true
   }, { 
     label: 'Línea',
     columnSize: '30%',
@@ -57,7 +63,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese la línea',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Tipo',
     columnSize: '20%',
@@ -65,7 +73,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Seleccione un tipo de vehículo',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Chasis',
     columnSize: '40%',
@@ -73,7 +83,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese el código del chasis',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Motor',
     columnSize: '40%',
@@ -81,7 +93,8 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese el tamaño del motor',
     error: false,
-    type: 'text'
+    type: 'text',
+    required: true
   }, { 
     label: 'Cilindros',
     columnSize: '30%',
@@ -89,7 +102,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de cilindros válido',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Toneladas',
     columnSize: '30%',
@@ -97,7 +112,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de toneladas válido',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Transmisión',
     columnSize: '40%',
@@ -106,6 +123,8 @@ const Vehiculos = () => {
     message: 'Seleccione el tipo de transmisión',
     error: false,
     type: 'select',
+    defaultValue: '',
+    required: true,
     options: [{
       label: 'Mecánica',
       value: 'Mecánica'
@@ -123,7 +142,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de asientos válido',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Color',
     columnSize: '50%',
@@ -131,7 +152,9 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un color',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Piloto',
     columnSize: '100%',
@@ -140,8 +163,13 @@ const Vehiculos = () => {
     message: 'Seleccione un piloto',
     error: false,
     type: 'select',
+    required: true,
+    defaultValue: '',
     options: []
-  }]);
+  }]
+
+  const [ vehiculos, setVehiculos ] = useState([])
+  const [fields, setFields] = useState([].concat(initialFieldsState));
   
   let columns= [
     { 
@@ -197,7 +225,7 @@ const Vehiculos = () => {
 
   const getPilotos = async (signal) => {
     try {
-      const response = await UsuariosHelper.buscarPilotos(signal.token)
+      const response = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.PILOTO)
       if (response) {
         const pilotos = response.map(res => {
           return {
@@ -262,10 +290,14 @@ const Vehiculos = () => {
     } 
   }
 
+  const resetFormStructure = () => {
+    setFields(initialFieldsState)
+  }
+
     return (
       <TablaEntidad
         entitiesList={vehiculos}
-        onCreate={enviarVehiculo}
+        onCreate={enviarVehiculo}        
         onEdit={editarVehiculo}
         onDelete={null}
         formFields={fields}
@@ -275,6 +307,7 @@ const Vehiculos = () => {
         entitiesListName="vehículos"
         entityName="vehículo"
         sideModalComponentRender={props => <Mantenimientos {...props}/> }
+        resetFormStructure={resetFormStructure}
         enableEdit
         enableDelete
         enebaleMaintenance

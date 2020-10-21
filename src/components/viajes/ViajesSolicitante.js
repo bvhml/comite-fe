@@ -4,14 +4,16 @@ import UserHelperMethods from '../../helpers/UserHelperMethods';
 import ViajesReducer from './../../reducers/ViajesReducer';
 import TablaEntidad from './../forms/TablaEntidad';
 import axios from 'axios';  
+import { rolesEnum } from '../../enums/RolesEnum';
 
-const ViajeSolicitante = ({ classes, mobile }) => {
+const ViajeSolicitante = () => {
 
   const ViajesHelper = new ViajesHelperMethods(process.env.REACT_APP_EP);
   const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
 
   const { viajes, setViajes} = useState([]);
-  
+
+  const nowDate = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`;  
   const initialState = {
     viajes: [],
     viaje: null,
@@ -23,37 +25,36 @@ const ViajeSolicitante = ({ classes, mobile }) => {
     editar: false
   };
   
-
-  const addChildForm = () => {
-    
-    fields[1].children.push([{ 
-      label: 'Fecha',
-      columnSize: '25%',
-      field: 'fecha',
-      validWhen: false,
-      message: 'Este campo es requerido',
-      error: false,
-      type: 'date'
-    }, { 
-      label: 'Dirección de destino',
-      columnSize: '75%',
-      field: 'descripcion',
-      validWhen: false,
-      message: 'Este campo es requerido',
-      error: false,
-      type: 'text'
-    }]);
-    setFields(fields);
-  }
- 
-  const [fields, setFields] = useState([{ 
+  const initialFieldsState = [{ 
+    label: 'Fecha',
+    columnSize: '24%',
+    field: 'fecha_0',
+    validWhen: false,
+    message: 'Este campo es requerido',
+    error: false,
+    type: 'date',
+    required: true,
+    defaultValue: nowDate
+  }, { 
     label: 'Dirección de origen',
-    columnSize: '100%',
-    field: 'ubicacion_inicio',
+    columnSize: '38%',
+    field: 'ubicacion_inicio_0',
     validWhen: false,
     message: 'Ingrese la dirección de origen',
     error: false,
-    type: 'text'
+    type: 'text',
+    required: true,
+    defaultValue: ''
+  }, { 
+    label: 'Dirección de destino',
+    columnSize: '38%',
+    field: 'ubicacion_fin_0',
+    validWhen: false,
+    message: 'Este campo es requerido',
+    error: false,
+    type: 'text',
+    required: true,
+    defaultValue: ''
   }, { 
     label: 'Agregar ruta',
     columnSize: '20%',
@@ -62,9 +63,68 @@ const ViajeSolicitante = ({ classes, mobile }) => {
     message: 'Debe agregar al menos una ruta',
     error: false,
     type: 'dynamic',
-    children: [],
-    onClick: addChildForm,
-  }]);
+    required: false
+  }, { 
+    label: 'Solicitar aprobación de un director',
+    columnSize: '100%',
+    field: 'id_director',
+    validWhen: false,
+    message: 'Ingrese la dirección de origen',
+    error: false,
+    type: 'select',
+    required: false,
+    defaultValue: 0,
+    options: [{
+      label: 'No solicitar',
+      value: 0
+    }]
+  }];
+ 
+  const [fields, setFields] = useState([].concat(initialFieldsState));
+
+  
+  const dynamicClick = () => {    
+
+    const index = ((fields.length - 5) / 3) + 1;
+
+    fields.splice(fields.length - 2, 0, { 
+      label: 'Fecha',
+      columnSize: '24%',
+      field: 'fecha_' + index,
+      validWhen: false,
+      message: 'Este campo es requerido',
+      error: false,
+      type: 'date',
+      required: true,
+      defaultValue: nowDate
+    });
+
+    fields.splice(fields.length - 2, 0, { 
+      label: 'Dirección de origen',
+      columnSize: '38%',
+      field: 'ubicacion_inicio_' + index,
+      validWhen: false,
+      message: 'Ingrese la dirección de origen',
+      error: false,
+      type: 'text',
+      required: true,
+      defaultValue: ''
+    })
+
+    fields.splice(fields.length - 2, 0, { 
+      label: 'Dirección de destino',
+      columnSize: '38%',
+      field: 'ubicacion_fin_' + index,
+      validWhen: false,
+      message: 'Este campo es requerido',
+      error: false,
+      type: 'text',
+      required: true,
+      defaultValue: ''
+    });
+    console.log(initialFieldsState);
+    setFields(fields);
+  }
 
   const columns= [
     { 
@@ -109,19 +169,19 @@ const ViajeSolicitante = ({ classes, mobile }) => {
     }  
   }
 
-  const getPilotos = async (signal) => {
+  const getDirectores = async (signal) => {
     try {
-      const response = await UsuariosHelper.buscarPilotos(signal.token)
+      const response = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.DIRECTOR)
       if (response) {
-        const pilotos = response.map(res => {
+        const directores = response.map(res => {
           return {
             label: res.nombre,
             value: res.id
           }
         })
         fields.forEach(field => {
-          if(field.label === 'Piloto') {
-            field.options = pilotos;
+          if(field.field === 'id_director') {
+            field.options = field.options.concat(directores);
           }
         });
         setFields(fields);
@@ -137,7 +197,7 @@ const ViajeSolicitante = ({ classes, mobile }) => {
   useEffect(() =>{
     let signal = axios.CancelToken.source();
     getViajes(signal);
-    getPilotos(signal);
+    getDirectores(signal);
     return ()=>{signal.cancel('Api is being canceled');}
   },[]);
 
@@ -152,6 +212,10 @@ const ViajeSolicitante = ({ classes, mobile }) => {
     } 
   }
 
+  const resetFormStructure = () => {
+    setFields(initialFieldsState)
+  }
+
   return (
     <TablaEntidad
       entitiesList={viajes}
@@ -162,6 +226,8 @@ const ViajeSolicitante = ({ classes, mobile }) => {
       initialState={initialState}
       entitiesListName="viajes"
       entityName="viaje"
+      dynamicClick={dynamicClick}
+      resetFormStructure={resetFormStructure}
     />
   );
 }

@@ -13,8 +13,6 @@ import { getRoleText, rolesEnum } from '../../enums/RolesEnum';
 const Usuarios = () => {
 
   const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
-
-  const [usuarios, setUsuarios] = useState([]);
   
   const initialState = {
     entity: null,
@@ -25,7 +23,8 @@ const Usuarios = () => {
     open: false,
     editar: false,
   };
-  let fields = [{ 
+
+  const initialFieldsState = [{ 
     label: 'Rol',
     columnSize: '20%',
     field: 'rol',
@@ -33,6 +32,8 @@ const Usuarios = () => {
     message: 'Seleccione un rol',
     error: false,
     type: 'select',
+    required: true,
+    defaultValue: '',
     options: [{
       label: getRoleText(rolesEnum.PILOTO),
       value: rolesEnum.PILOTO
@@ -53,7 +54,9 @@ const Usuarios = () => {
     validWhen: false,
     message: 'Nombres requeridos',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Apellido',
     columnSize: '40%',
@@ -61,7 +64,9 @@ const Usuarios = () => {
     validWhen: true,
     message: 'Apellidos requeridos',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Edad',
     columnSize: '40%',
@@ -69,7 +74,9 @@ const Usuarios = () => {
     validWhen: false,
     message: 'Edad requerida',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'DPI',
     columnSize: '60%',
@@ -77,7 +84,9 @@ const Usuarios = () => {
     validWhen: false,
     message: 'DPI requerido',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Correo electrónico',  
     columnSize: '100%',
@@ -85,7 +94,9 @@ const Usuarios = () => {
     validWhen: true,
     message: 'Correo electrónico requerido',
     error: false,
-    type: 'text'
+    type: 'text',
+    defaultValue: '',
+    required: true
   }, { 
     label: 'Contraseña',  
     columnSize: '100%',
@@ -93,7 +104,9 @@ const Usuarios = () => {
     validWhen: true,
     message: 'Contraseña requerida',
     error: false,
-    type: 'password'
+    type: 'password',
+    defaultValue: '',
+    required: true
   }];
   
   let columns= [
@@ -123,6 +136,9 @@ const Usuarios = () => {
     },
   ];
 
+  const [usuarios, setUsuarios] = useState([]);
+  const [fields, setFields] = useState([].concat(initialFieldsState))
+
   const getTodosUsuarios = async (signal)=>{
     try {
       const response = await UsuariosHelper.buscarUsuarios(signal.token)
@@ -141,7 +157,7 @@ const Usuarios = () => {
     getTodosUsuarios(signal);
     return ()=>{
       signal.cancel('Api is being canceled');}
-  },[]);
+  }, []);
 
   const enviarUsuario = async usuario => {
     try {
@@ -165,6 +181,10 @@ const Usuarios = () => {
     } 
   }
 
+  const resetFormStructure = () => {
+    setFields(initialFieldsState)
+  }
+
   return (
     <TablaEntidad
       entitiesList={usuarios}
@@ -177,6 +197,7 @@ const Usuarios = () => {
       initialState={initialState}
       entitiesListName="usuarios"
       entityName="usuario"
+      resetFormStructure={resetFormStructure}
       enableEdit
       enableDelete
     />

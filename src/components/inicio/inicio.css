@@ -21,3 +21,7 @@
 .menu-principal__logo {
     padding: 1.5rem;
 }
+
+.display-none {
+    display: none !important;
+}
