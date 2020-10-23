@@ -7,9 +7,9 @@ const SelectEntidad = ({ field, meta, fieldItem }) => {
         <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
             <FormControl fullWidth={true} margin="dense">
                 <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
-                <Select className="formulario-entidad__input" id={fieldItem.field} name={field.name} onChange={field.onChange} children={
+                <Select className="formulario-entidad__input" id={fieldItem.field} name={field.name} required={fieldItem.required} value={field.value} onChange={field.onChange} children={
                     fieldItem.options && fieldItem.options.map(option => {
-                        return <option style={{ cursor: 'pointer' }} selected={field.value === option.value} value={option.value}>{option.label}</option>
+                        return <option style={{ cursor: 'pointer' }} value={option.value}>{option.label}</option>
                     })                                                
                 }></Select>
                 { meta.touched && meta.error && <div className="error">{meta.error}</div> }

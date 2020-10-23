@@ -7,11 +7,11 @@ import FormularioEntidad from '../forms/FormularioEntidad';
 import './forms.scss';
 
 
-const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enebaleMaintenance, dynamicClick, resetFormStructure }) => {
+const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { entity, isLoading, open, editar, side } = state;
+    const { entity, isLoading, open, editar, side, view } = state;
     const [actions, setActions] = useState([]);
 
     // Methods
@@ -36,10 +36,18 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
 
     // Lifecycle
     useEffect(() => {
+
+        if(enableView) {
+            actions.push({
+                icon: tableIcons.VisibilityIcon,
+                tooltip: `Ver ${entityName}`
+            });
+        }
+
         if(enebaleMaintenance) {
             actions.push({
                 icon: tableIcons.BuildIcon,
-                tooltip: 'Mantenimiento de vehiculo',
+                tooltip: `Mantenimiento de ${entityName}`,
                 onClick: (event, rowData) => {
                     dispatch({ type: 'entity', payload: rowData });
                     dispatch({type: 'side'})
@@ -50,7 +58,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
         if(enableEdit) {
             actions.push({
                 icon: tableIcons.Edit,
-                tooltip: 'Editar vehiculo',
+                tooltip: `Editar ${entityName}`,
                 onClick: (event, rowData) => {                                
                     dispatch({type: 'editar'})
                     dispatch({ type: 'entity', payload: rowData });
@@ -61,7 +69,11 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
         if(enableDelete) {
             actions.push({
                 icon: tableIcons.Delete,
-                tooltip: 'Eliminar vehiculo'
+                tooltip: `Eliminar ${entityName}`,
+                onClick: (event, rowData) => {                                
+                    dispatch({type: 'editar'})
+                    dispatch({ type: 'entity', payload: rowData });
+                }
             });
         }
 
@@ -74,7 +86,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                 <div className="tabla-entidad__encabezado">
                     <Grid container justify='flex-end'>
                         <Button className="tabla-entidad__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar {entityName}</Button>
-                    </Grid>
+                    </Grid> 
 
                     <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
                         { entitiesList && (entitiesList.length > 0) && !isLoading && <MaterialTable
@@ -121,6 +133,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         aria-describedby="simple-modal-description"
                         children={<div><FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} dynamicClick={dynamicClick} /></div> }
                     />
+
                     <Modal
                         open={editar || false}
                         onClose={()=> dispatch({ type: 'noEditar'})}

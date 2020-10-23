@@ -74,17 +74,9 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
     switch(pagina) {
       case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
       case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
-      case 'viaje': return usuario && getTripComponentByRole(usuario.rol)
+      case 'viaje': return <ViajeSolicitante user={usuario} />
       case 'mantenimiento-vehiculo': return <MantenimientoVehiculo classes={classes} mobile={mobile}/>
       default: return <Vehiculos classes={classes} mobile={mobile}/>
-    }
-  }
-
-  const getTripComponentByRole = role => {
-    switch(role) {
-      case 2: return <ViajeSolicitante />
-      case 3: return <ViajeSolicitante />
-      case 4: return <ViajeSolicitante />
     }
   }
 
@@ -147,7 +139,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         <div className={classes.drawerHeader} />
         <Grid container component="main" className={classes.root} style={{backgroundColor:'transparent', height:"auto", minHeight:'100vh'}}>
             <CssBaseline />
-            { getComponent(params.pagina, classes, mobile) }  
+            { usuario && getComponent(params.pagina, classes, mobile) }  
         </Grid>
       </main>
     </div>

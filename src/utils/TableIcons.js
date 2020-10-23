@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, FilterList, FirstPage, LastPage, Remove, SaveAlt, Search, ViewColumn, BuildOutlined, EditOutlined } from '@material-ui/icons';
+import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, FilterList, FirstPage, LastPage, Remove, SaveAlt, Search, ViewColumn, BuildOutlined, EditOutlined, Visibility } from '@material-ui/icons';
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -19,7 +19,8 @@ const tableIcons = {
     SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
-    BuildIcon: forwardRef((props, ref) =><BuildOutlined {...props} ref={ref}/>)
+    BuildIcon: forwardRef((props, ref) =><BuildOutlined {...props} ref={ref}/>),
+    VisibilityIcon: forwardRef((props, ref) =><Visibility {...props} ref={ref}/>)
 };
 
 export default tableIcons

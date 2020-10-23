@@ -22,7 +22,7 @@
 
 .formulario-entidad {
     background-color: #ffffff;
-    width: 50rem;
+    width: 60rem;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -60,12 +60,23 @@
         display: block !important;
         margin: auto !important;
         border: 0.0625rem solid #e04046 !important;
+
+        &__wrapper {
+            margin-top: 1rem;
+            width: 100%;
+        }
+    }
+
+    &__presentation {
+        &__label {
+            font-weight: 600;
+        }
     }
 
     .error {
         font-size: 0.75rem;
         color: #e04046;
         position: absolute;
-        bottom: -1.25rem;
+        top: calc(100% + 0.125rem);
     }
 }

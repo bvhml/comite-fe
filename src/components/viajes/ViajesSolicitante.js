@@ -5,15 +5,16 @@ import ViajesReducer from './../../reducers/ViajesReducer';
 import TablaEntidad from './../forms/TablaEntidad';
 import axios from 'axios';  
 import { rolesEnum } from '../../enums/RolesEnum';
+import { getStatusText } from '../../enums/StatusEnum';
 
-const ViajeSolicitante = () => {
+const ViajeSolicitante = ({ user }) => {
 
   const ViajesHelper = new ViajesHelperMethods(process.env.REACT_APP_EP);
   const UsuariosHelper = new UserHelperMethods(process.env.REACT_APP_EP); 
 
-  const { viajes, setViajes} = useState([]);
+  const [viajes, setViajes] = useState([]);
 
-  const nowDate = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`;  
+  const nowDate = `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}T${new Date().getHours() + 1}:${new Date().getMinutes()}`;  
   const initialState = {
     viajes: [],
     viaje: null,
@@ -27,17 +28,17 @@ const ViajeSolicitante = () => {
   
   const initialFieldsState = [{ 
     label: 'Fecha',
-    columnSize: '24%',
+    columnSize: '22%',
     field: 'fecha_0',
     validWhen: false,
     message: 'Este campo es requerido',
     error: false,
-    type: 'date',
+    type: 'datetime-local',
     required: true,
     defaultValue: nowDate
   }, { 
     label: 'Dirección de origen',
-    columnSize: '38%',
+    columnSize: '33%',
     field: 'ubicacion_inicio_0',
     validWhen: false,
     message: 'Ingrese la dirección de origen',
@@ -47,7 +48,7 @@ const ViajeSolicitante = () => {
     defaultValue: ''
   }, { 
     label: 'Dirección de destino',
-    columnSize: '38%',
+    columnSize: '33%',
     field: 'ubicacion_fin_0',
     validWhen: false,
     message: 'Este campo es requerido',
@@ -55,6 +56,16 @@ const ViajeSolicitante = () => {
     type: 'text',
     required: true,
     defaultValue: ''
+  }, { 
+    label: 'Personas',
+    columnSize: '12%',
+    field: 'numero_personas_0',
+    validWhen: false,
+    message: 'Este campo es requerido',
+    error: false,
+    type: 'number',
+    required: true,
+    defaultValue: 1
   }, { 
     label: 'Agregar ruta',
     columnSize: '20%',
@@ -73,10 +84,10 @@ const ViajeSolicitante = () => {
     error: false,
     type: 'select',
     required: false,
-    defaultValue: 0,
+    defaultValue: -1,
     options: [{
       label: 'No solicitar',
-      value: 0
+      value: -1
     }]
   }];
  
@@ -85,23 +96,23 @@ const ViajeSolicitante = () => {
   
   const dynamicClick = () => {    
 
-    const index = ((fields.length - 5) / 3) + 1;
+    const index = ((fields.length - 6) / 4) + 1;
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Fecha',
-      columnSize: '24%',
+      columnSize: '22%',
       field: 'fecha_' + index,
       validWhen: false,
       message: 'Este campo es requerido',
       error: false,
-      type: 'date',
+      type: 'datetime-local',
       required: true,
       defaultValue: nowDate
     });
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Dirección de origen',
-      columnSize: '38%',
+      columnSize: '33%',
       field: 'ubicacion_inicio_' + index,
       validWhen: false,
       message: 'Ingrese la dirección de origen',
@@ -113,7 +124,7 @@ const ViajeSolicitante = () => {
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Dirección de destino',
-      columnSize: '38%',
+      columnSize: '33%',
       field: 'ubicacion_fin_' + index,
       validWhen: false,
       message: 'Este campo es requerido',
@@ -122,58 +133,97 @@ const ViajeSolicitante = () => {
       required: true,
       defaultValue: ''
     });
-    console.log(initialFieldsState);
+    
+    fields.splice(fields.length - 2, 0, { 
+      label: 'Personas',
+      columnSize: '12%',
+      field: 'numero_personas_' + index,
+      validWhen: false,
+      message: 'Este campo es requerido',
+      error: false,
+      type: 'number',
+      required: true,
+      defaultValue: 1
+    });
+
     setFields(fields);
   }
 
-  const columns= [
-    { 
-      title: 'Destino', 
-      field: 'ubicacion_fin',
+  const columns= [{ 
+      title: 'Rutas',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.marca}</div>
-    },
-    { 
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas.length}</div>
+    }, { 
+      title: 'Solicitante',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombreSolicitante}</div>
+    }, { 
+       title: 'Director',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombreDirector}</div>
+    }, { 
+      title: 'Dirección inicial',
+      searchable:true,
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas[0].ubicacion_inicio}</div>
+    }, { 
       title: 'Estatus',
-      field: 'id_estatus',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.transmision}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{getStatusText(rowData.id_estatus)}</div>
     }
   ];
 
   const mapPilotosToViaje = async (viajes, signal) => {
-    viajes.forEach(async viaje => {            
+    return Promise.all(await viajes.map(async viaje => {            
       // Map pilotos
-      await viaje.rutas.forEach(async ruta => {
+      viaje.rutas = await Promise.all( await viaje.rutas.map(async ruta => {
           if(ruta){
-              const response = await UsuariosHelper.buscarUsuarioById(ruta.id_conductor, signal.token)
-              ruta.nombrePiloto = response.nombre;
+              const response = await UsuariosHelper.buscarUsuarioById(ruta.id_conductor, signal.token);
+              if(response){
+                ruta.nombrePiloto = response.nombre;
+              } else {
+                ruta.nombrePiloto = 'No asignado';
+              }
           } else {
               ruta.nombrePiloto = 'No asignado';
-          }        
-      });    
-    });
+          }  
+          return ruta;      
+      }));
+      return viaje    
+    }));
   }
 
   const getViajes = async signal => {
     try {
-      const response = await ViajesHelper.getViajes(signal.token)
+      let response = null;
+      switch(user.rol) {
+        case rolesEnum.SOLICITANTE:
+          response = await ViajesHelper.getViajesBySolicitant(signal.token, user.id);
+          break;
+        case rolesEnum.DIRECTOR:
+          response = await ViajesHelper.getViajesBySolicitant(signal.token, user.id);
+          break;
+        default:
+          response = await ViajesHelper.getViajes(signal.token);
+          break;
+      }
       if (response) {
-        await mapPilotosToViaje(response, signal)
-        setViajes(response)
+        //viajes = await mapPilotosToViaje(response, signal)
+        await getUsers(signal, response);
+        setViajes(response);
       } 
     } catch (error) {
+        console.log(error);
         if (axios.isCancel(error)) {
             //console.log('Error: ', error.message); // => prints: Api is being canceled
         }
     }  
   }
 
-  const getDirectores = async (signal) => {
+  const getUsers = async (signal, viajes) => {
     try {
-      const response = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.DIRECTOR)
-      if (response) {
-        const directores = response.map(res => {
+      let directores = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.DIRECTOR)
+      if (directores) {
+        directores = directores.map(res => {
           return {
             label: res.nombre,
             value: res.id
@@ -186,6 +236,19 @@ const ViajeSolicitante = () => {
         });
         setFields(fields);
 
+        viajes = await Promise.all(await viajes.map(async viaje => {
+          if(!viaje.nombreSolicitante) {
+            const solicitante = await UsuariosHelper.buscarUsuarioById(viaje.id_solicitante)
+            viaje.nombreSolicitante = solicitante.nombre
+          }
+          directores.forEach(director => {
+            if(!viaje.nombreDirector && viaje.id_director === director.value){
+              viaje.nombreDirector = director.label;
+            }
+          })
+          viaje.nombreDirector = viaje.nombreDirector || 'No aplica';
+        }));
+
       } 
     } catch (error) {
         if (axios.isCancel(error)) {
@@ -197,12 +260,12 @@ const ViajeSolicitante = () => {
   useEffect(() =>{
     let signal = axios.CancelToken.source();
     getViajes(signal);
-    getDirectores(signal);
     return ()=>{signal.cancel('Api is being canceled');}
-  },[]);
+  }, []);
 
   const solicitarViaje = async (viaje) => {
     try {
+      viaje.id_solicitante = user.id;
       await ViajesHelper.solicitarViaje(viaje);
       viajes.push(viaje);
       setViajes(viajes)
@@ -228,6 +291,7 @@ const ViajeSolicitante = () => {
       entityName="viaje"
       dynamicClick={dynamicClick}
       resetFormStructure={resetFormStructure}
+      enableView
     />
   );
 }

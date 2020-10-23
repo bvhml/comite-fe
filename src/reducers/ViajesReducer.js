@@ -61,6 +61,20 @@ const ViajesReducer = (state, action) => {
           ...state,
           editar: false,
         };
+      }      
+      case 'view': {
+        return {
+          ...state,
+          error: '',
+          view: true,
+        };
+      }     
+      case 'noView': {
+        return {
+          ...state,
+          error: '',
+          view: false,
+        };
       }
       default:
         return state;

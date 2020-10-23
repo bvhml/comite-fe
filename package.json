@@ -12,6 +12,7 @@
     "formik": "^2.2.0",
     "jwt-decode": "^2.2.0",
     "material-table": "^1.69.0",
+    "moment": "^2.29.1",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-backdrop-filter": "^2.1.0",
