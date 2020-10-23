@@ -267,8 +267,7 @@ const ViajeSolicitante = ({ user }) => {
     try {
       viaje.id_solicitante = user.id;
       await ViajesHelper.solicitarViaje(viaje);
-      viajes.push(viaje);
-      setViajes(viajes)
+      getViajes(axios.CancelToken.source());
     }
     catch (error) {
       console.log(error);
