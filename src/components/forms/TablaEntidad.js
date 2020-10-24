@@ -32,7 +32,8 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
 
     const handleEdit = async entity => {
         await onEdit(entity);
-        dispatch({ type: 'noEditar'})
+        dispatch({ type: 'noEditar'});        
+        resetFormStructure();
     }
 
     // Lifecycle
