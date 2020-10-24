@@ -1,3 +1,4 @@
+import { statusEnum } from '../enums/StatusEnum';
 import AuthHelperMethods from './AuthHelperMethods';
 
 export default class ViajesHelperMethods {
@@ -7,11 +8,11 @@ export default class ViajesHelperMethods {
     }
 
     mapViaje = viaje => {
-        viaje.id_estatus = 0;
         if(viaje.id_director === -1){
             viaje.id_director = 0;
             viaje.id_estatus = 1;
         }
+        viaje.id_estatus = viaje.id_estatus || 0;
         viaje.rutas = [];
         Object.keys(viaje).forEach(viajePropKey => {
             switch(viajePropKey.substring(0, viajePropKey.length - 1)) {
@@ -41,6 +42,19 @@ export default class ViajesHelperMethods {
         viaje.rutas = JSON.parse(viaje.rutas);
         viaje.id_estatus = viaje.id_estatus || 0;
         viaje.id_estatus = Number.parseInt(viaje.id_estatus);
+    }
+
+    mapPilotos = viaje => {
+        Object.keys(viaje).forEach(viajePropKey => {
+            if(viajePropKey.substring(0, viajePropKey.length - 1) === 'id_conductor_') {
+                const index = Number.parseInt(viajePropKey.substring(viajePropKey.length - 1, viajePropKey.length));
+                viaje.rutas[index] = {
+                    ...viaje.rutas[index],
+                    [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
+                }
+                viaje[viajePropKey] = undefined;
+            }
+        })
     }
 
     solicitarViaje = async viaje => {
@@ -137,7 +151,7 @@ export default class ViajesHelperMethods {
                 config.headers["Authorization"] = "Bearer " + Auth.getToken();
             }
       
-            let response = await fetch(`http://${process.env.REACT_APP_EP}/viaje/misviajes/todos`, config);
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/viaje/todos`, config);
             response = await response.json();
             response.forEach(this.mapRutas);
             return response;
@@ -151,6 +165,9 @@ export default class ViajesHelperMethods {
         try {
             const Auth = new AuthHelperMethods(this.domain);
             this.mapViaje(viaje);
+            if(viaje.id_estatus === statusEnum.ASIGNED) {
+                this.mapPilotos(viaje);
+            }            
             let config = {
                 method: 'PUT',
                 headers: {

@@ -10,7 +10,7 @@ const statusEnum = {
 const getStatusText = statusId => {
     switch(statusId) {
         case statusEnum.SOLICITED: return 'Solicitado';
-        case statusEnum.APROVED: return 'Aprobado';
+        case statusEnum.APROVED: return 'Autorizado';
         case statusEnum.ASIGNED: return 'Asignado';
         case statusEnum.IN_PROGRESS: return 'En Progreso';
         case statusEnum.FINISHED: return 'Completado';

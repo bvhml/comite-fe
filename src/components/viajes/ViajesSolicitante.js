@@ -74,9 +74,10 @@ const ViajeSolicitante = ({ user }) => {
     message: 'Debe agregar al menos una ruta',
     error: false,
     type: 'dynamic',
+    childFields: ['fecha', 'ubicacion_inicio', 'ubicacion_fin', 'numero_personas'],
     required: false
   }, { 
-    label: 'Solicitar aprobación de un director',
+    label: 'Aprobar por director',
     columnSize: '100%',
     field: 'id_director',
     validWhen: false,
@@ -89,12 +90,27 @@ const ViajeSolicitante = ({ user }) => {
       label: 'No solicitar',
       value: -1
     }]
-  }];
- 
+  }]; 
   const [fields, setFields] = useState([].concat(initialFieldsState));
+  const [pilotos, setPilotos] = useState([]);
+  const [pilotsAssignmentFields, setPilotAssignmentFields] = useState([]);
+
+  const permissions = {
+    enableAssignment: user.rol === rolesEnum.ADMINISTRADOR, 
+    enableAproval: user.rol === rolesEnum.DIRECTOR, 
+    onAssign: async (viaje) => {
+      await editarViaje(viaje, 2);
+    }, 
+    onAprove: async (viaje) => {
+      await editarViaje(viaje, 1);
+    }, 
+    onDeny: async (viaje) => {
+      await editarViaje(viaje, -1);
+    }
+  }
 
   
-  const dynamicClick = () => {    
+  const dynamicClick = (data) => {    
 
     const index = ((fields.length - 6) / 4) + 1;
 
@@ -107,7 +123,7 @@ const ViajeSolicitante = ({ user }) => {
       error: false,
       type: 'datetime-local',
       required: true,
-      defaultValue: nowDate
+      defaultValue: data && data.fecha || nowDate
     });
 
     fields.splice(fields.length - 2, 0, { 
@@ -119,7 +135,7 @@ const ViajeSolicitante = ({ user }) => {
       error: false,
       type: 'text',
       required: true,
-      defaultValue: ''
+      defaultValue: data && data.ubicacion_inicio || ''
     })
 
     fields.splice(fields.length - 2, 0, { 
@@ -131,7 +147,7 @@ const ViajeSolicitante = ({ user }) => {
       error: false,
       type: 'text',
       required: true,
-      defaultValue: ''
+      defaultValue: data && data.ubicacion_fin || ''
     });
     
     fields.splice(fields.length - 2, 0, { 
@@ -143,10 +159,45 @@ const ViajeSolicitante = ({ user }) => {
       error: false,
       type: 'number',
       required: true,
-      defaultValue: 1
+      defaultValue: data && data.numero_personas || 1
     });
 
     setFields(fields);
+  }
+
+  const entityToFormFields = entity => {
+    
+    entity.rutas.forEach((ruta, index) => {
+      pilotsAssignmentFields.push({
+        label: 'Piloto',
+        columnSize: '100%',
+        field: `id_conductor_${index}`,
+        type: 'select',
+        required: true,
+        defaultValue: '',
+        options: pilotos.map(piloto => {
+          return {
+            label: `${piloto.nombre} ${piloto.apellido}`,
+            value: piloto.id
+          }
+        })
+      })
+      setPilotAssignmentFields(pilotsAssignmentFields);
+
+      if(index > 0) {
+        dynamicClick(ruta);
+      }
+      else {
+        for(const rutaProperty in ruta) {
+          fields.forEach(field => {
+            if(field.field === `${rutaProperty}_${index}`) {
+              field.defaultValue = ruta[rutaProperty];
+            }
+          })
+        }
+      }      
+    });
+    setFields(fields)
   }
 
   const columns= [{ 
@@ -164,7 +215,7 @@ const ViajeSolicitante = ({ user }) => {
     }, { 
       title: 'Dirección inicial',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas[0].ubicacion_inicio}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas.length && rowData.rutas[0].ubicacion_inicio}</div>
     }, { 
       title: 'Estatus',
       searchable:true,
@@ -190,6 +241,19 @@ const ViajeSolicitante = ({ user }) => {
       }));
       return viaje    
     }));
+  }
+
+  const getPilotos = async (signal) => {
+    try {
+      const pilotos = await UserHelperMethods.buscarUsuarioByRol(signal, rolesEnum.PILOTO)
+      setPilotos(pilotos);
+    }
+    catch (error) {
+      console.log(error);
+        if (axios.isCancel(error)) {
+            //console.log('Error: ', error.message); // => prints: Api is being canceled
+        }
+    } 
   }
 
   const getViajes = async signal => {
@@ -225,7 +289,7 @@ const ViajeSolicitante = ({ user }) => {
       if (directores) {
         directores = directores.map(res => {
           return {
-            label: res.nombre,
+            label: `${res.nombre} ${res.apellido}`,
             value: res.id
           }
         })
@@ -234,12 +298,13 @@ const ViajeSolicitante = ({ user }) => {
             field.options = field.options.concat(directores);
           }
         });
+        await mapPilotosToViaje(viajes, signal);
         setFields(fields);
 
         viajes = await Promise.all(await viajes.map(async viaje => {
           if(!viaje.nombreSolicitante) {
             const solicitante = await UsuariosHelper.buscarUsuarioById(viaje.id_solicitante)
-            viaje.nombreSolicitante = solicitante.nombre
+            viaje.nombreSolicitante = `${solicitante.nombre} ${solicitante.apellido}`
           }
           directores.forEach(director => {
             if(!viaje.nombreDirector && viaje.id_director === director.value){
@@ -260,6 +325,7 @@ const ViajeSolicitante = ({ user }) => {
   useEffect(() =>{
     let signal = axios.CancelToken.source();
     getViajes(signal);
+    getPilotos(signal);
     return ()=>{signal.cancel('Api is being canceled');}
   }, []);
 
@@ -272,6 +338,18 @@ const ViajeSolicitante = ({ user }) => {
     catch (error) {
       console.log(error);
     } 
+  }
+
+  const editarViaje = async (viaje, status) => {
+    try {
+      viaje.id_estatus = status;
+      let signal = axios.CancelToken.source()
+      await ViajesHelper.editarViaje(signal, viaje);
+      getViajes(signal);
+    }
+    catch (error) {
+      console.log(error);
+    }
   }
 
   const resetFormStructure = () => {
@@ -290,7 +368,10 @@ const ViajeSolicitante = ({ user }) => {
       entityName="viaje"
       dynamicClick={dynamicClick}
       resetFormStructure={resetFormStructure}
+      entityToFormFields={entityToFormFields}
       enableView
+      permissions={permissions}
+      assigneesFieldData={pilotsAssignmentFields}
     />
   );
 }

@@ -20,7 +20,7 @@
     padding: 2rem;
 }
 
-.formulario-entidad {
+.formulario-entidad, .presentacion-entidad {
     background-color: #ffffff;
     width: 60rem;
     position: absolute;
@@ -46,12 +46,30 @@
         font-size: 0.875rem !important;
     }
 
+    &__buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
     &__boton-ingresar {
         background-color: #e04046 !important;
         color: #ffffff !important;
         float: right;
         margin-top: 1rem !important;
         margin-right: 1rem !important;
+    }
+
+    &__boton-aprobar {
+        background-color: #e04046 !important;
+        color: #ffffff !important;
+    }
+
+    &__boton-denegar {
+        color: #e04046 !important;
+        background-color: #ffffff !important;
+        border: 0.0625rem solid #e04046 !important;
+        margin-right: 1.5rem !important;;
     }
 
     &__boton-agregar {
@@ -70,6 +88,54 @@
     &__presentation {
         &__label {
             font-weight: 600;
+        }
+    }
+
+    &__array {
+
+        &__label {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        &__content {            
+            border: 0.025rem solid gray;
+            border-radius: 0.25rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+
+            &__item {
+
+                padding: 0 0.5rem;
+                &__wrapper {                    
+                    display: grid;
+                    grid-template-columns: 2fr 2fr 1fr 1fr;
+                    margin-bottom: 2.5rem;
+
+                    &--assignment {
+                        grid-template-columns: 2fr 2fr 1fr 1fr 1.5fr;
+                    }
+
+                    &:last-child {
+                        margin: 0;
+                    }
+                }
+                
+                &__label {
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    &__item {
+        display: flex;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+        &__label {
+            font-weight: 600;
+            margin-right: 0.5rem;
         }
     }
 

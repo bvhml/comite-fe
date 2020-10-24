@@ -5,9 +5,10 @@ import tableIcons from './../../utils/TableIcons';
 import FormularioEntidad from '../forms/FormularioEntidad';
 
 import './forms.scss';
+import PresentacionEntidad from './PresentacionEntidad';
 
 
-const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure }) => {
+const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure, entityToFormFields, permissions, assigneesFieldData }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -40,7 +41,14 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
         if(enableView) {
             actions.push({
                 icon: tableIcons.VisibilityIcon,
-                tooltip: `Ver ${entityName}`
+                tooltip: `Ver ${entityName}`,
+                onClick: (event, rowData) => {
+                    dispatch({ type: 'entity', payload: rowData });
+                    if(rowData && entityToFormFields) {
+                        entityToFormFields(rowData);
+                    }
+                    dispatch({type: 'view'})
+                }
             });
         }
 
@@ -50,6 +58,9 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                 tooltip: `Mantenimiento de ${entityName}`,
                 onClick: (event, rowData) => {
                     dispatch({ type: 'entity', payload: rowData });
+                    if(rowData && entityToFormFields) {
+                        entityToFormFields(rowData);
+                    }
                     dispatch({type: 'side'})
                 }
             });
@@ -61,7 +72,10 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                 tooltip: `Editar ${entityName}`,
                 onClick: (event, rowData) => {                                
                     dispatch({type: 'editar'})
-                    dispatch({ type: 'entity', payload: rowData });
+                    dispatch({ type: 'entity', payload: rowData });                    
+                    if(rowData && entityToFormFields) {
+                        entityToFormFields(rowData);
+                    }
                 }
             });
         }
@@ -72,11 +86,13 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                 tooltip: `Eliminar ${entityName}`,
                 onClick: (event, rowData) => {                                
                     dispatch({type: 'editar'})
-                    dispatch({ type: 'entity', payload: rowData });
+                    dispatch({ type: 'entity', payload: rowData });                   
+                    if(rowData && entityToFormFields) {
+                        entityToFormFields(rowData);
+                    }
                 }
             });
         }
-
         setActions(actions);
     }, []);
 
@@ -125,13 +141,20 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
 
                         {isLoading && <Grid> Cargando {entitiesListName}...</Grid>} 
                     </Grid>
-
                     <Modal
                         open={open || false}
                         onClose={handleClose}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
                         children={<div><FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} dynamicClick={dynamicClick} /></div> }
+                    />
+
+                    <Modal
+                        open={view || false}
+                        onClose={()=> dispatch({ type: 'noView'})}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        children={<div><PresentacionEntidad entity={entity} fields={formFields} {...permissions} closeModal={() => { dispatch({type: 'noView'}) }} assigneesFieldData={assigneesFieldData} /></div>}
                     />
 
                     <Modal
@@ -142,7 +165,11 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         children={<div><FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /></div>}
                     />
 
-                    <Modal open={side || false} onClose={()=> dispatch({ type: 'noSide'})} children={<div> { side && entity && sideModalComponentRender({ entityId: entity.id }) } </div>} />
+                    <Modal 
+                        open={side || false} 
+                        onClose={()=> dispatch({ type: 'noSide'})} 
+                        children={<div> { side && entity && sideModalComponentRender({ entityId: entity.id }) } </div>} 
+                    />
                 </div>
             </div>
         </Grid>
