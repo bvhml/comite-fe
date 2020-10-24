@@ -270,7 +270,7 @@ const ViajeSolicitante = ({ user }) => {
           response = await ViajesHelper.getViajesBySolicitant(signal.token, user.id);
           break;
         case rolesEnum.DIRECTOR:
-          response = await ViajesHelper.getViajesBySolicitant(signal.token, user.id);
+          response = await ViajesHelper.getViajesByDirector(signal.token, user.id);
           break;
         default:
           response = await ViajesHelper.getViajes(signal.token);
