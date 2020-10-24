@@ -152,7 +152,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
 
                     <Modal
                         open={view || false}
-                        onClose={()=> dispatch({ type: 'noView'})}
+                        onClose={()=> { dispatch({ type: 'noView'}); resetFormStructure();}}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
                         children={<div><PresentacionEntidad entity={entity} fields={formFields} {...permissions} closeModal={() => { dispatch({type: 'noView'}) }} assigneesFieldData={assigneesFieldData} /></div>}
