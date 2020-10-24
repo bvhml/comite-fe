@@ -4,23 +4,23 @@ import { withFormik, Field, Form } from 'formik';
 import SelectEntidad from './SelectEntidad';
 import { statusEnum } from '../../enums/StatusEnum';
 
-const PresentacionEntidad = ({ values, fields, enableAssignment, enableAproval, enableStart, enableFinish, onAprove, onAssign, onStart, onFinish, onDeny, closeModal, assigneesFieldData }) => {
+const PresentacionEntidad = ({ entity, values, fields, enableAssignment, enableAproval, onAprove, onAssign, onStart, onFinish, onDeny, closeModal, assigneesFieldData }) => {
 
     const handleSumbission = async event => {
         event.preventDefault();
-        if(enableAproval) {
+        if(enableAproval && values.id_estatus === statusEnum.SOLICITED) {
             await onAprove(values);
             closeModal();
         }
-        else if(enableAssignment) {
+        else if(enableAssignment && values.id_estatus === statusEnum.APROVED) {
             await onAssign(values);
             closeModal();
         }
-        else if(enableStart) {
+        else if(enableAssignment && values.id_estatus === statusEnum.ASIGNED) {
             await onStart(values);
             closeModal();
         }
-        else if(enableFinish) {
+        else if(enableAssignment && values.id_estatus === statusEnum.IN_PROGRESS) {
             await onFinish(values);
             closeModal();
         }
@@ -41,15 +41,15 @@ const PresentacionEntidad = ({ values, fields, enableAssignment, enableAproval, 
                 </div>
             );
         }
-        else if(enableAssignment || enableStart || enableFinish) {
+        else if(enableAssignment) {
             let buttonText = '';
-            if(enableAssignment){
+            if(enableAssignment && values.id_estatus === statusEnum.APROVED){
                 buttonText = 'Asignar';
             }
-            else if(enableStart){
+            else if(enableAssignment && values.id_estatus === statusEnum.ASIGNED){
                 buttonText = 'Iniciar viaje';
             }
-            else if(enableFinish){
+            else if(enableAssignment && values.id_estatus === statusEnum.IN_PROGRESS){
                 buttonText = 'Finalizar viaje';
             }
             return (

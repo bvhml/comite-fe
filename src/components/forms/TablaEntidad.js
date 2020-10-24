@@ -42,10 +42,10 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
             actions.push({
                 icon: tableIcons.VisibilityIcon,
                 tooltip: `Ver ${entityName}`,
-                onClick: (event, rowData) => {
+                onClick: async (event, rowData) => {
                     dispatch({ type: 'entity', payload: rowData });
                     if(rowData && entityToFormFields) {
-                        entityToFormFields(rowData);
+                        await entityToFormFields(rowData);
                     }
                     dispatch({type: 'view'})
                 }

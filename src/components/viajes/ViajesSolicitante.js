@@ -5,7 +5,7 @@ import ViajesReducer from './../../reducers/ViajesReducer';
 import TablaEntidad from './../forms/TablaEntidad';
 import axios from 'axios';  
 import { rolesEnum } from '../../enums/RolesEnum';
-import { getStatusText } from '../../enums/StatusEnum';
+import { getStatusText, statusEnum } from '../../enums/StatusEnum';
 
 const ViajeSolicitante = ({ user }) => {
 
@@ -92,20 +92,25 @@ const ViajeSolicitante = ({ user }) => {
     }]
   }]; 
   const [fields, setFields] = useState([].concat(initialFieldsState));
-  const [pilotos, setPilotos] = useState([]);
   const [pilotsAssignmentFields, setPilotAssignmentFields] = useState([]);
 
   const permissions = {
     enableAssignment: user.rol === rolesEnum.ADMINISTRADOR, 
     enableAproval: user.rol === rolesEnum.DIRECTOR, 
     onAssign: async (viaje) => {
-      await editarViaje(viaje, 2);
+      await editarViaje(viaje, statusEnum.ASIGNED);
     }, 
     onAprove: async (viaje) => {
-      await editarViaje(viaje, 1);
+      await editarViaje(viaje, statusEnum.APROVED);
+    },
+    onStart: async (viaje) => {
+      await editarViaje(viaje, statusEnum.IN_PROGRESS);
     }, 
+    onFinish: async (viaje) => {
+      await editarViaje(viaje, statusEnum.FINISHED);
+    },
     onDeny: async (viaje) => {
-      await editarViaje(viaje, -1);
+      await editarViaje(viaje, statusEnum.CANCELLED);
     }
   }
 
@@ -165,8 +170,9 @@ const ViajeSolicitante = ({ user }) => {
     setFields(fields);
   }
 
-  const entityToFormFields = entity => {
-    
+  const entityToFormFields = async entity => {
+    let signal = axios.CancelToken.source();
+    let pilotos = await getPilotos(signal);
     entity.rutas.forEach((ruta, index) => {
       pilotsAssignmentFields.push({
         label: 'Piloto',
@@ -245,8 +251,8 @@ const ViajeSolicitante = ({ user }) => {
 
   const getPilotos = async (signal) => {
     try {
-      const pilotos = await UserHelperMethods.buscarUsuarioByRol(signal, rolesEnum.PILOTO)
-      setPilotos(pilotos);
+      const pilotos = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.PILOTO);
+      return pilotos;
     }
     catch (error) {
       console.log(error);
@@ -325,7 +331,6 @@ const ViajeSolicitante = ({ user }) => {
   useEffect(() =>{
     let signal = axios.CancelToken.source();
     getViajes(signal);
-    getPilotos(signal);
     return ()=>{signal.cancel('Api is being canceled');}
   }, []);
 

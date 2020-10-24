@@ -10,36 +10,43 @@ export default class ViajesHelperMethods {
     mapViaje = viaje => {
         if(viaje.id_director === -1){
             viaje.id_director = 0;
-            viaje.id_estatus = 1;
+            viaje.id_estatus = statusEnum.APROVED;
         }
-        viaje.id_estatus = viaje.id_estatus || 0;
-        viaje.rutas = [];
-        Object.keys(viaje).forEach(viajePropKey => {
-            switch(viajePropKey.substring(0, viajePropKey.length - 1)) {
-                case 'fecha_':
-                case 'ubicacion_inicio_':
-                case 'ubicacion_fin_':
-                case 'numero_personas_':
-                    const index = Number.parseInt(viajePropKey.substring(viajePropKey.length - 1, viajePropKey.length));
-                    if(!viaje.rutas[index]) {
-                        viaje.rutas[index] = {
-                            [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
+        viaje.id_estatus = viaje.id_estatus || statusEnum.SOLICITED;
+        if(viaje.id_estatus === statusEnum.SOLICITED){
+            viaje.rutas = [];
+            Object.keys(viaje).forEach(viajePropKey => {
+                switch(viajePropKey.substring(0, viajePropKey.length - 1)) {
+                    case 'fecha_':
+                    case 'ubicacion_inicio_':
+                    case 'ubicacion_fin_':
+                    case 'numero_personas_':
+                        const index = Number.parseInt(viajePropKey.substring(viajePropKey.length - 1, viajePropKey.length));
+                        if(!viaje.rutas[index]) {
+                            viaje.rutas[index] = {
+                                [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
+                            }
                         }
-                    }
-                    else {
-                        viaje.rutas[index] = {
-                            ...viaje.rutas[index],
-                            [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
+                        else {
+                            viaje.rutas[index] = {
+                                ...viaje.rutas[index],
+                                [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
+                            }
                         }
-                    }
-                    viaje[viajePropKey] = undefined;
-                    break;
-            }
-        })
+                        viaje[viajePropKey] = undefined;
+                        break;
+                }
+            });
+        }        
     }
 
     mapRutas = viaje => {
         viaje.rutas = JSON.parse(viaje.rutas);
+        viaje.rutas.forEach((ruta, index) => {
+            if(ruta.id_conductor){
+                viaje[`id_conductor_${index}`] = ruta.id_conductor;
+            }
+        })
         viaje.id_estatus = viaje.id_estatus || 0;
         viaje.id_estatus = Number.parseInt(viaje.id_estatus);
     }
@@ -48,10 +55,8 @@ export default class ViajesHelperMethods {
         Object.keys(viaje).forEach(viajePropKey => {
             if(viajePropKey.substring(0, viajePropKey.length - 1) === 'id_conductor_') {
                 const index = Number.parseInt(viajePropKey.substring(viajePropKey.length - 1, viajePropKey.length));
-                viaje.rutas[index] = {
-                    ...viaje.rutas[index],
-                    [viajePropKey.substring(0, viajePropKey.length - 2)]: viaje[viajePropKey]
-                }
+                viaje.rutas[index].id_conductor = viaje[viajePropKey]
+                
                 viaje[viajePropKey] = undefined;
             }
         })
