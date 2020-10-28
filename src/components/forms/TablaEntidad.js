@@ -106,38 +106,40 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                     </Grid> 
 
                     <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
-                        { entitiesList && (entitiesList.length > 0) && !isLoading && <MaterialTable
-                        icons={tableIcons}
-                        columns={columns}
-                        data={entitiesList}
-                        stickyHeader
-                        title={`Gestionar ${entitiesListName}`}
-                        style={{padding: '3vh', width:'100%', height:'auto'}}
-                        options={{
-                            search: false,
-                            searchFieldAlignment:'left',
-                            defaultGroupOrder:'0',
-                            pageSize: 10,
-                            actionsColumnIndex: -1,
-                            rowStyle:{backgroundColor:'whitesmoke',
-                            emptyRowsWhenPaging: true,}}
-                            }
-                            
-                        localization={{ 
-                            toolbar: { searchPlaceholder: 'Buscar' },
-                            body: {
-                                emptyDataSourceMessage: 'No hay resultados',
-                                filterRow: {
-                                    filterTooltip: 'Filter'
+                        { entitiesList && (entitiesList.length > 0) && !isLoading && 
+                        <MaterialTable
+                            icons={tableIcons}
+                            columns={columns}
+                            data={entitiesList}
+                            stickyHeader
+                            title={`Gestionar ${entitiesListName}`}
+                            style={{padding: '3vh', width:'100%', height:'auto'}}
+                            options={{
+                                search: false,
+                                searchFieldAlignment:'left',
+                                defaultGroupOrder:'0',
+                                exportButton: true,
+                                filtering: true,
+                                pageSize: 10,
+                                actionsColumnIndex: -1,
+                                rowStyle:{backgroundColor:'whitesmoke',
+                                emptyRowsWhenPaging: true,}}
                                 }
-                            },
-                            header:{
-                                actions:''
-                            } 
-                            }}
+                                
+                            localization={{ 
+                                toolbar: { searchPlaceholder: 'Buscar' },
+                                body: {
+                                    emptyDataSourceMessage: 'No hay resultados',
+                                    filterRow: {
+                                        filterTooltip: 'Filter'
+                                    }
+                                },
+                                header:{
+                                    actions:''
+                                } 
+                                }}
 
-                            actions={actions}
-                            
+                                actions={actions}
                         />}
 
                         {isLoading && <Grid> Cargando {entitiesListName}...</Grid>} 

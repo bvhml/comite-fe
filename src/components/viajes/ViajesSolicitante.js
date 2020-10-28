@@ -209,22 +209,31 @@ const ViajeSolicitante = ({ user }) => {
   const columns= [{ 
       title: 'Rutas',
       searchable:true,
+      filtering: true,
       render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas.length}</div>
     }, { 
       title: 'Solicitante',
+      field: 'nombreSolicitante',
       searchable:true,
+      filtering: true,
       render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombreSolicitante}</div>
     }, { 
-       title: 'Director',
-      searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombreDirector}</div>
+        title: 'Director',
+        field: 'nombreDirector',
+        searchable:true,
+        filtering: true,
+        render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.nombreDirector}</div>
     }, { 
       title: 'Dirección inicial',
       searchable:true,
+      filtering: true,
       render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.rutas.length && rowData.rutas[0].ubicacion_inicio}</div>
     }, { 
       title: 'Estatus',
+      field: 'id_estatus',
       searchable:true,
+      filtering: true,
+      lookup: { 0: 'Solicitado', 1: 'Autorizado', 2: 'Asignado', 3: 'En Progreso', 4: 'Completado', '-1': 'Cancelado' },
       render: rowData => <div style={{color:'cornflowerblue'}}>{getStatusText(rowData.id_estatus)}</div>
     }
   ];

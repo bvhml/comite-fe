@@ -114,6 +114,7 @@ const Usuarios = () => {
       title: 'Rol', 
       field: 'rol',
       searchable:true,
+      lookup: { 1: 'Piloto', 2: 'Solicitante', 3: 'Administrador', 4: 'Director'},
       render: rowData => <div style={{color:'cornflowerblue'}}>{getRoleText(rowData.rol)}</div>
     },
     { 
