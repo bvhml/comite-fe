@@ -49,7 +49,7 @@ const FormularioEntidad = ({ title, fields, dynamicClick, resetForm, values, set
                                                 <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
                                                     <FormControl fullWidth={true} margin="dense">
                                                         <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
-                                                        <Input className="formulario-entidad__input" type={fieldItem.type} {...field} required={fieldItem.required} />
+                                                        <Input className="formulario-entidad__input" type={fieldItem.type} {...field} required={fieldItem.required} readOnly={fieldItem.readOnly} />
                                                         { meta.touched && meta.error && <div className="error">{meta.error}</div> }
                                                     </FormControl>
                                                 </div>

@@ -19,6 +19,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { Usuarios } from '../usuarios/index';
 import Vehiculos from '../vehiculos/Vehiculos';
 import MantenimientoVehiculo from '../vehiculos/MantenimientoVehiculo';
+import { rolesEnum } from '../../enums/RolesEnum';
 
 import './inicio.css'
 import ViajeSolicitante from '../viajes/ViajesSolicitante';
@@ -98,7 +99,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         <List>
 
           {usuario ? 
-            ((usuario.rol === 3 || usuario.rol === 4 || true)? 
+            ((usuario.rol >= rolesEnum.ADMINISTRADOR)? 
           <ListItem button key={'Vehiculos'} selected={navOption === 'vehiculos'} onClick={()=>{selectNavOption('vehiculos')}}>
             <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/home/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
@@ -106,25 +107,19 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
           
 
           {usuario &&
-          ((usuario.rol === 4 || true) &&
+          ((usuario.rol === rolesEnum.DIRECTOR) &&
           <ListItem button key={'Usuarios'} selected={navOption === 'usuarios'} onClick={()=>{selectNavOption('usuarios')}}>
             <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/usuarios')}}/></ListItemIcon>
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
           )}
 
-          {usuario &&
-          ((usuario.rol === 4 || usuario.rol === 3 || usuario.rol === 2 || true) &&
+          {usuario  &&
           <ListItem button key={'Viajes'} selected={navOption === 'viaje'} onClick={()=>{selectNavOption('viaje')}}>
             <ListItemIcon><CommuteIcon onClick={()=>{history.push('/home/viaje')}}/></ListItemIcon>
             <ListItemText primary={'Viajes'}/>
           </ListItem>
-          )}
-
-          <ListItem button key={'Cambiar mi contraseña'} selected={navOption === 'reiniciar-contraseña'} onClick={()=>{selectNavOption('reiniciar-contraseña')}}>
-            <ListItemIcon>{<VpnKeyIcon onClick={()=>{history.push('/programa')}}/>}</ListItemIcon>
-            <ListItemText primary={'Cambiar mi contraseña'}/>
-          </ListItem>
+          }
         </List>
         <div className="cerrar-sesion" onClick={()=>{selectNavOption('logout')}}>
           <ExitToAppIcon />
