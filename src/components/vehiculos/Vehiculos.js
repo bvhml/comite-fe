@@ -274,19 +274,8 @@ const Vehiculos = () => {
     try {
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
       await VehiculosHelper.guardarVehiculo(vehiculo);
-      let signal = axios.CancelToken.source();
-      
-      try {
-        const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
-        if (response) {
-          setVehiculos(response);
-        } 
-      } 
-      catch (error) {
-          if (axios.isCancel(error)) {
-            //console.log('Error: ', error.message); // => prints: Api is being canceled
-        }
-      } 
+      let signal = axios.CancelToken.source();      
+      getTodosVehiculos(signal);
     }
     catch (error) {
       console.log(error);
