@@ -186,7 +186,7 @@ const ViajeSolicitante = ({ user }) => {
           pilotoItem.vehiculos.forEach(vehiculo => {
             if(ruta.numero_personas <= vehiculo.asientos) {
               options.push({
-                label: `${pilotoItem.nombre} ${pilotoItem.apellido} (${vehiculo.marca} ${vehiculo.lienea} - ${vehiculo.asientos} asientos)`,
+                label: `${pilotoItem.nombre} ${pilotoItem.apellido} (${vehiculo.marca} ${vehiculo.linea} - ${vehiculo.asientos} asientos)`,
                 value: pilotoItem.id
               });
             }            
