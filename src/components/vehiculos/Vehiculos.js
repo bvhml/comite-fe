@@ -199,21 +199,22 @@ const Vehiculos = () => {
   ];
 
   const mapPilotoToVehiculo = async (vehiculos, signal) => {
-    vehiculos.forEach(async vehiculo => {
+    return Promise.all(vehiculos.map(async vehiculo => {
       if(vehiculo.piloto){
         const response = await UsuariosHelper.buscarUsuarioById(vehiculo.piloto, signal.token)
         vehiculo.nombrePiloto = response.nombre;
       } else {
         vehiculo.nombrePiloto = 'No aplica';
-      }      
-    });
+      }  
+      return vehiculo;    
+    }));
   }
 
   const getTodosVehiculos = async (signal)=>{
     try {
-      const response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
+      let response = await VehiculosHelper.obtenerTodosVehiculos(signal.token)
       if (response) {
-        await mapPilotoToVehiculo(response, signal);
+        response = await mapPilotoToVehiculo(response, signal);
         setVehiculos(response);
       } 
     } catch (error) {
@@ -258,9 +259,11 @@ const Vehiculos = () => {
 
   const enviarVehiculo = async entity => {
     try {
-      await VehiculosHelper.guardarVehiculo(entity);
+      await VehiculosHelper.guardarVehiculo(entity);      
+      let signal = axios.CancelToken.source();
       vehiculos.push(entity);
       setVehiculos(vehiculos);
+      getTodosVehiculos(signal);
     }
     catch (error) {
       console.log(error);
