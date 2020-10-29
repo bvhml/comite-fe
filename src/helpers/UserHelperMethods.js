@@ -92,4 +92,28 @@ export default class UserHelperMethods {
         const usuarios = await this.buscarUsuarios(cancelToken);
         return usuarios.filter(usuario => usuario.rol === rol);
     }
+
+    getPilotos = async () => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+            let response = await fetch(`${httpsCall}://${this.domain}/vehiculos/asignados`, config)
+            response = await response.json();
+            response.forEach(piloto => {
+                piloto.vehiculos = JSON.parse(piloto.vehiculos);
+            })
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

@@ -179,14 +179,20 @@ const ViajeSolicitante = ({ user }) => {
         columnSize: '100%',
         field: `id_conductor_${index}`,
         type: 'select',
+        readOnly: entity.id_estatus > statusEnum.ASIGNED,
         required: true,
         defaultValue: '',
-        options: pilotos.map(piloto => {
-          return {
-            label: `${piloto.nombre} ${piloto.apellido}`,
-            value: piloto.id
-          }
-        })
+        options: pilotos.reduce((options, pilotoItem) => {
+          pilotoItem.vehiculos.forEach(vehiculo => {
+            if(ruta.numero_personas <= vehiculo.asientos) {
+              options.push({
+                label: `${pilotoItem.nombre} ${pilotoItem.apellido} (${vehiculo.marca} ${vehiculo.lienea} - ${vehiculo.asientos} asientos)`,
+                value: pilotoItem.id
+              });
+            }            
+          })
+          return options;
+        }, [])
       })
       setPilotAssignmentFields(pilotsAssignmentFields);
 
@@ -241,9 +247,10 @@ const ViajeSolicitante = ({ user }) => {
   const mapPilotosToViaje = async (viajes, signal) => {
     return Promise.all(await viajes.map(async viaje => {            
       // Map pilotos
-      viaje.rutas = await Promise.all( await viaje.rutas.map(async ruta => {
+      viaje.rutas = await Promise.all( await viaje.rutas.map(async (ruta, index) => {
           if(ruta){
               const response = await UsuariosHelper.buscarUsuarioById(ruta.id_conductor, signal.token);
+              viaje[`id_conductor_${index}`] = ruta.id_conductor;
               if(response){
                 ruta.nombrePiloto = response.nombre;
               } else {
@@ -260,7 +267,7 @@ const ViajeSolicitante = ({ user }) => {
 
   const getPilotos = async (signal) => {
     try {
-      const pilotos = await UsuariosHelper.buscarUsuarioByRol(signal.token, rolesEnum.PILOTO);
+      const pilotos = await UsuariosHelper.getPilotos();
       return pilotos;
     }
     catch (error) {

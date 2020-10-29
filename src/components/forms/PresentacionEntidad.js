@@ -41,7 +41,7 @@ const PresentacionEntidad = ({ entity, values, fields, enableAssignment, enableA
                 </div>
             );
         }
-        else if(enableAssignment) {
+        else if(enableAssignment && values.id_estatus !== statusEnum.CANCELLED && values.id_estatus !== statusEnum.FINISHED) {
             let buttonText = '';
             if(enableAssignment && values.id_estatus === statusEnum.APROVED){
                 buttonText = 'Asignar';

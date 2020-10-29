@@ -13,7 +13,7 @@ export default class ViajesHelperMethods {
             viaje.id_estatus = statusEnum.APROVED;
         }
         viaje.id_estatus = viaje.id_estatus || statusEnum.SOLICITED;
-        if(viaje.id_estatus === statusEnum.SOLICITED){
+        if(viaje.id_estatus === statusEnum.SOLICITED || viaje.id_director === 0){
             viaje.rutas = [];
             Object.keys(viaje).forEach(viajePropKey => {
                 switch(viajePropKey.substring(0, viajePropKey.length - 1)) {
@@ -159,7 +159,7 @@ export default class ViajesHelperMethods {
             let response = await fetch(`http://${process.env.REACT_APP_EP}/viaje/todos`, config);
             response = await response.json();
             response.forEach(this.mapRutas);
-            return response;
+            return response.filter(trip => trip.id_estatus !== statusEnum.SOLICITED);
         }
         catch (error) {
             throw error;
