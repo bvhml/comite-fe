@@ -264,6 +264,7 @@ const Vehiculos = () => {
       vehiculos.push(entity);
       setVehiculos(vehiculos);
       getTodosVehiculos(signal);
+      getPilotos(signal);
     }
     catch (error) {
       console.log(error);
@@ -276,6 +277,7 @@ const Vehiculos = () => {
       await VehiculosHelper.guardarVehiculo(vehiculo);
       let signal = axios.CancelToken.source();      
       getTodosVehiculos(signal);
+      getPilotos(signal);
     }
     catch (error) {
       console.log(error);
