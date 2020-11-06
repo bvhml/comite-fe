@@ -21,7 +21,6 @@ export default function App (props) {
 
   
   const mobile = useMediaQuery('(min-width:600px)');
-  
   let useStyles = makeStyles(theme => ({
     root: {
       height:  '100vh',

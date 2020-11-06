@@ -46,6 +46,9 @@ const Usuarios = () => {
     }, {
       label: getRoleText(rolesEnum.DIRECTOR),
       value: rolesEnum.DIRECTOR
+    }, {
+      label: getRoleText(rolesEnum.SUPPORT),
+      value: rolesEnum.SUPPORT
     }]
   }, {
     label: 'Nombres',
@@ -114,7 +117,13 @@ const Usuarios = () => {
       title: 'Rol', 
       field: 'rol',
       searchable:true,
-      lookup: { 1: 'Piloto', 2: 'Solicitante', 3: 'Administrador', 4: 'Director'},
+      lookup: {
+        [rolesEnum.PILOTO]: getRoleText(rolesEnum.PILOTO),
+        [rolesEnum.SOLICITANTE]: getRoleText(rolesEnum.SOLICITANTE),
+        [rolesEnum.ADMINISTRADOR]: getRoleText(rolesEnum.ADMINISTRADOR),
+        [rolesEnum.DIRECTOR]: getRoleText(rolesEnum.DIRECTOR),
+        [rolesEnum.SUPPORT]: getRoleText(rolesEnum.SUPPORT)
+      },
       render: rowData => <div style={{color:'cornflowerblue'}}>{getRoleText(rowData.rol)}</div>
     },
     { 

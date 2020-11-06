@@ -171,7 +171,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                     <Modal 
                         open={side || false} 
                         onClose={()=> dispatch({ type: 'noSide'})} 
-                        children={<div> { side && entity && sideModalComponentRender({ entityId: entity.id }) } </div>} 
+                        children={<div> { side && entity && sideModalComponentRender({ entityId: entity.id, onClose(){ dispatch({ type: 'noSide'}) } }) } </div>} 
                     />
                 </div>
             </div>

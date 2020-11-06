@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Dialog from '@material-ui/core/Dialog';
@@ -20,6 +20,10 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Slide from '@material-ui/core/Slide';
+import { rolesEnum } from '../../enums/RolesEnum';
+import { useHistory } from 'react-router-dom';
+import UserHelperMethods from '../../helpers/UserHelperMethods';
+import axios from 'axios';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -112,18 +116,34 @@ let validationResponse =  {};
 
 const SignInForm =  ({classes, mobile}) => {
 
-
+  const history = useHistory();
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-  const { from } = { from: { pathname: "/home/vehiculos" } };
   
   const [state, dispatch] = useReducer(loginReducer, initialState);
+  const [usuario, setUsuario] = useState({});
   const { username, password, isLoading, error, showError } = state;
 
   useEffect(() =>{
     if (!Auth.loggedIn()){
       Auth.logout();
     }
-  }, [Auth]);
+  }, [Auth]);  
+
+  const initializeSessionByRole = () => {
+    switch(usuario.rol) {
+      case rolesEnum.PILOTO:
+      case rolesEnum.SOLICITANTE:
+      case rolesEnum.DIRECTOR:
+        history.push('/home/viaje');
+        break;
+      case rolesEnum.ADMINISTRADOR:
+        history.push('/home/vehiculos');
+        break;
+      case rolesEnum.SUPPORT:
+        history.push('/home/usuarios');
+        break;
+    }
+  }
   
   function handleSubmit(e){
     
@@ -135,13 +155,18 @@ const SignInForm =  ({classes, mobile}) => {
     
     if (validation.isValid) {
       Auth.login(username, password)
-        .then(res => {
+        .then(async res => {
           if (res.data.status === 400) {
             dispatch({ type: 'error' });
           }
           else if (res.data.status === 200){
-            dispatch({ type: 'success' });
             localStorage.setItem("usuario", res.data.user);
+            let signal = axios.CancelToken.source();
+            const UserHelperMethodsInstance = new UserHelperMethods(process.env.REACT_APP_EP); 
+            const response = await UserHelperMethodsInstance.buscarUsuario(res.data.user, signal.token)
+            setUsuario(response)
+            initializeSessionByRole();
+            dispatch({ type: 'success' });
           }
         })
         .catch(err => {
@@ -157,7 +182,7 @@ const SignInForm =  ({classes, mobile}) => {
   } 
 
   if (Auth.loggedIn()) {
-    return <Redirect to={from}/>;
+    initializeSessionByRole();
   }
     return(
       <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'3vh 12vh', height:'auto', minHeight:'100vh'}}>

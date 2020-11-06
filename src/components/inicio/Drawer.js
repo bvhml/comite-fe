@@ -30,11 +30,11 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
   const open = true;
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);  
 
-  const [ usuario, setUsuario ] = useState(null);
-  const [ navOption, setNavOption] = useState('vehiculos');
-
   const history = useHistory();
   let params = useParams();
+
+  const [ usuario, setUsuario ] = useState(null);
+  const [ navOption, setNavOption] = useState(params.pagina);
 
   
   useEffect(()=>{
@@ -42,7 +42,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
     const getUsuario = async ()=>{
       const UserHelperMethodsInstance = new UserHelperMethods(process.env.REACT_APP_EP); 
       try {
-        const response = await UserHelperMethodsInstance.buscarUsuario(localStorage.getItem('usuario'),signal.token)
+        const response = await UserHelperMethodsInstance.buscarUsuario(localStorage.getItem('usuario'), signal.token)
         setUsuario(response);
         if (response) {
           if ((Number(response.inicio_sesion) === 0) && false) {
@@ -69,15 +69,31 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
       history.push(`/home/${option}`);
       setNavOption(option);
     }    
-  }  
+  } 
 
   const getComponent = (pagina, classes, mobile) => {
     switch(pagina) {
-      case 'vehiculos': return <Vehiculos classes={classes} mobile={mobile}/>
-      case 'usuarios': return <Usuarios classes={classes} mobile={mobile}/>
-      case 'viaje': return <ViajeSolicitante user={usuario} />
-      case 'mantenimiento-vehiculo': return <MantenimientoVehiculo classes={classes} mobile={mobile}/>
-      default: return <Vehiculos classes={classes} mobile={mobile}/>
+      case 'vehiculos': 
+        if(usuario.rol !== rolesEnum.ADMINISTRADOR) {
+          history.push('/home/viaje');
+          break;
+        }
+        return <Vehiculos classes={classes} mobile={mobile}/>
+        
+      case 'usuarios':
+        if(usuario.rol !== rolesEnum.SUPPORT) {
+          history.push('/home/viaje');
+          break;
+        }
+        return <Usuarios classes={classes} mobile={mobile}/>
+      case 'viajes':
+        if(usuario.rol === rolesEnum.SUPPORT) {
+          history.push('/home/usuarios');
+          break;
+        }
+        return <ViajeSolicitante user={usuario} />
+      
+      default: return <ViajeSolicitante user={usuario} />
     }
   }
 
@@ -99,7 +115,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         <List>
 
           {usuario ? 
-            ((usuario.rol >= rolesEnum.ADMINISTRADOR)? 
+            ((usuario.rol === rolesEnum.ADMINISTRADOR)? 
           <ListItem button key={'Vehiculos'} selected={navOption === 'vehiculos'} onClick={()=>{selectNavOption('vehiculos')}}>
             <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/home/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
@@ -107,14 +123,14 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
           
 
           {usuario &&
-          ((usuario.rol === rolesEnum.DIRECTOR) &&
+          ((usuario.rol === rolesEnum.SUPPORT) &&
           <ListItem button key={'Usuarios'} selected={navOption === 'usuarios'} onClick={()=>{selectNavOption('usuarios')}}>
             <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/usuarios')}}/></ListItemIcon>
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
           )}
 
-          {usuario  &&
+          {usuario  && usuario.rol !== rolesEnum.SUPPORT &&
           <ListItem button key={'Viajes'} selected={navOption === 'viaje'} onClick={()=>{selectNavOption('viaje')}}>
             <ListItemIcon><CommuteIcon onClick={()=>{history.push('/home/viaje')}}/></ListItemIcon>
             <ListItemText primary={'Viajes'}/>
