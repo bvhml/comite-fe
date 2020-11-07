@@ -68,7 +68,7 @@ export default class UserHelperMethods {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ usuario })
+                body: JSON.stringify(usuario)
             }
 
             if (Auth.loggedIn()) {
@@ -93,7 +93,7 @@ export default class UserHelperMethods {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ usuario })
+                body: JSON.stringify(usuario)
             }
 
             if (Auth.loggedIn()) {
