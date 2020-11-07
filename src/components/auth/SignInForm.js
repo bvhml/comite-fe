@@ -23,6 +23,7 @@ import Slide from '@material-ui/core/Slide';
 import { rolesEnum } from '../../enums/RolesEnum';
 import { useHistory } from 'react-router-dom';
 import UserHelperMethods from '../../helpers/UserHelperMethods';
+import Hidden from '@material-ui/core/Hidden';
 import axios from 'axios';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -303,8 +304,10 @@ const SignInForm =  ({classes, mobile}) => {
               </form>
             </Grid>  
           </Grid>
-        </Grid>  
-        <Grid item xs={false} sm={5} md={7} component={Paper} className={classes.image} elevation={5} square style={{borderRadius: '0px 3px 3px 0px'}}/>
+        </Grid> 
+        <Hidden mdDown>
+          <Grid item xs={false} sm={5} md={7} component={Paper} className={classes.image} elevation={5} square style={{borderRadius: '0px 3px 3px 0px'}}/>
+        </Hidden> 
       </Grid>
     );
     
