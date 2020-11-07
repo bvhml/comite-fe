@@ -6,13 +6,14 @@ import FormularioEntidad from '../forms/FormularioEntidad';
 
 import './forms.scss';
 import PresentacionEntidad from './PresentacionEntidad';
+import ConfirmAction from './ConfirmAction';
 
 
 const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure, entityToFormFields, permissions, assigneesFieldData }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { entity, isLoading, open, editar, side, view } = state;
+    const { entity, isLoading, open, editar, side, view, eliminar } = state;
     const [actions, setActions] = useState([]);
 
     // Methods
@@ -86,11 +87,8 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                 icon: tableIcons.Delete,
                 tooltip: `Eliminar ${entityName}`,
                 onClick: (event, rowData) => {                                
-                    dispatch({type: 'editar'})
-                    dispatch({ type: 'entity', payload: rowData });                   
-                    if(rowData && entityToFormFields) {
-                        entityToFormFields(rowData);
-                    }
+                    dispatch({type: 'eliminar'})
+                    dispatch({ type: 'entity', payload: rowData });
                 }
             });
         }
@@ -166,6 +164,14 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
                         children={<div><FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /></div>}
+                    />
+
+                    <Modal
+                        open={eliminar || false}
+                        onClose={()=> dispatch({ type: 'noEliminar'})}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        children={<div><ConfirmAction message={`¿Está seguro de que desea eliminar este ${entityName}?`} confirmAction={() => { onDelete(entity) }} cancelAction={()=> dispatch({ type: 'noEliminar'})} confirmText="Eliminar" cancelText="Cancelar" /></div>}
                     />
 
                     <Modal 

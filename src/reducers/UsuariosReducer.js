@@ -58,6 +58,18 @@ const UsuariosReducer = (state, action) => {
           editar: false,
         };
       
+      case 'eliminar': 
+        return {
+          ...state,
+          eliminar: true,
+        };
+      
+      case 'noEliminar': 
+        return {
+          ...state,
+          eliminar: false,
+        };
+      
       default:
         return state;
     }

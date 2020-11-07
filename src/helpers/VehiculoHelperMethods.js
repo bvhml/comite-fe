@@ -30,6 +30,57 @@ export default class VehiculoHelperMethods {
             throw error;
         }
     }
+    
+    editarVehiculo = async vehiculo => {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ vehiculo: vehiculo })
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/vehiculos`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    eliminarVehiculo = async vehiculo => {
+        try {
+            vehiculo.eliminado = true;
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ vehiculo: vehiculo })
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/vehiculos`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 
     obtenerTodosVehiculos = async (cancelToken) => {
         try {
@@ -89,6 +140,57 @@ export default class VehiculoHelperMethods {
             const Auth = new AuthHelperMethods(this.domain);
             let config = {
                 method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mantenimiento: mantenimiento })
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/mantenimiento-vehiculo`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    async editarMantenimiento(mantenimiento) {
+        try {
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ mantenimiento: mantenimiento })
+            }
+
+            if (Auth.loggedIn()) {
+                config.headers["Authorization"] = "Bearer " + Auth.getToken();
+            }
+      
+            let response = await fetch(`http://${process.env.REACT_APP_EP}/mantenimiento-vehiculo`, config);
+            let jsonResponse = await response.json();
+            return jsonResponse;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    async eliminarMantenimiento(mantenimiento) {
+        try {
+            mantenimiento.eliminado = true;
+            const Auth = new AuthHelperMethods(this.domain);
+            let config = {
+                method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'

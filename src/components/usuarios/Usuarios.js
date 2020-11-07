@@ -109,7 +109,7 @@ const Usuarios = () => {
     error: false,
     type: 'password',
     defaultValue: '',
-    required: true
+    required: false
   }];
   
   let columns= [
@@ -191,6 +191,17 @@ const Usuarios = () => {
     } 
   }
 
+  const eliminarUsuario = async usuario => {
+    try {
+      let signal = axios.CancelToken.source();
+      await UsuariosHelper.eliminarUsuario(usuario);
+      getTodosUsuarios(signal);
+    }
+    catch (error) {
+      console.log(error);
+    } 
+  }
+
   const resetFormStructure = () => {
     setFields(initialFieldsState)
   }
@@ -200,7 +211,7 @@ const Usuarios = () => {
       entitiesList={usuarios}
       onCreate={enviarUsuario}
       onEdit={editarUsuario}
-      onDelete={null}
+      onDelete={eliminarUsuario}
       formFields={fields}
       columns={columns}
       reducer={UsuariosReducer}

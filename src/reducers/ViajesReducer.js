@@ -75,6 +75,20 @@ const ViajesReducer = (state, action) => {
           error: '',
           view: false,
         };
+      }      
+      case 'eliminar': {
+        return {
+          ...state,
+          error: '',
+          eliminar: true,
+        };
+      }     
+      case 'noEliminar': {
+        return {
+          ...state,
+          error: '',
+          eliminar: false,
+        };
       }
       default:
         return state;

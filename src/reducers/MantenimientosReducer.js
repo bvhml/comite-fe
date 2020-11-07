@@ -4,7 +4,7 @@ const MantenimientosReducer = (state, action) => {
           return {
             ...state,
             error: false,
-            mantenimiento: {...state.mantenimiento,[action.fieldName]:action.payload},
+            entity: {...state.entity,[action.fieldName]:action.payload},
           };
         }
         case 'load': {
@@ -14,17 +14,10 @@ const MantenimientosReducer = (state, action) => {
             isLoading: true,
           };
         }
-        case 'mantenimientos': {
+        case 'entity': {
           return {
             ...state,
-            mantenimientos: action.payload,
-            isLoading: false,
-          };
-        }
-        case 'mantenimiento': {
-          return {
-            ...state,
-            mantenimiento: action.payload,
+            entity: action.payload,
             isLoading: false,
           };
         }
@@ -64,6 +57,18 @@ const MantenimientosReducer = (state, action) => {
           return {
             ...state,
             editar: false,
+          };
+        }
+        case 'eliminar': {
+          return {
+            ...state,
+            eliminar: true,
+          };
+        }
+        case 'noEliminar': {
+          return {
+            ...state,
+            eliminar: false,
           };
         }
         default:

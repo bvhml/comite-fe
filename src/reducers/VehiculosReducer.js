@@ -74,6 +74,18 @@ const VehiculosReducer = (state, action) => {
           side: false,
         };
       
+        case 'eliminar': 
+          return {
+            ...state,
+            eliminar: false,
+          };
+        
+        case 'noEliminar': 
+          return {
+            ...state,
+            eliminar: false,
+          };
+      
       default:
         return state;
     }

@@ -102,11 +102,6 @@ const Mantenimientos = ({ entityId, onClose }) => {
     setFields(initialFieldsState)
   }
 
-  const handleSubmit = event => {
-      event.preventDefault();      
-      enviarMantenimiento();
-  }
-
   const enviarMantenimiento = async (mantenimiento) => {
     try {
       mantenimiento.vehiculoId = entityId;
@@ -122,7 +117,27 @@ const Mantenimientos = ({ entityId, onClose }) => {
   const editarMantenimiento = async (mantenimiento) => {
     try {
       mantenimiento.vehiculoId = entityId;
-      let saveResponse = await VehiculosHelper.guardarMantenimiento(mantenimiento);      
+      let saveResponse = await VehiculosHelper.editarMantenimiento(mantenimiento);      
+      try {
+        const response = await VehiculosHelper.getMantenimientos(entityId)
+        if (response) {
+          setMantenimientos(response);
+        } 
+      } catch (error) {
+          if (axios.isCancel(error)) {
+            //console.log('Error: ', error.message); // => prints: Api is being canceled
+        }
+      }  
+    }
+    catch (error) {
+      console.log(error);
+    } 
+  }
+
+  const eliminarMantenimiento = async (mantenimiento) => {
+    try {
+      mantenimiento.vehiculoId = entityId;
+      let saveResponse = await VehiculosHelper.eliminarMantenimiento(mantenimiento);      
       try {
         const response = await VehiculosHelper.getMantenimientos(entityId)
         if (response) {

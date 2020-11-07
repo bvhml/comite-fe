@@ -202,7 +202,7 @@ const Vehiculos = () => {
     return Promise.all(vehiculos.map(async vehiculo => {
       if(vehiculo.piloto){
         const response = await UsuariosHelper.buscarUsuarioById(vehiculo.piloto, signal.token)
-        vehiculo.nombrePiloto = response.nombre;
+        vehiculo.nombrePiloto = `${response.nombre} ${response.apellido}`;
       } else {
         vehiculo.nombrePiloto = 'No aplica';
       }  
@@ -230,7 +230,7 @@ const Vehiculos = () => {
       if (response) {
         const pilotos = response.map(res => {
           return {
-            label: res.nombre,
+            label: `${res.nombre} ${res.apellido}`,
             value: res.id
           }
         })
@@ -274,7 +274,20 @@ const Vehiculos = () => {
   const editarVehiculo = async (vehiculo) => {
     try {
       const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
-      await VehiculosHelper.guardarVehiculo(vehiculo);
+      await VehiculosHelper.editarVehiculo(vehiculo);
+      let signal = axios.CancelToken.source();      
+      getTodosVehiculos(signal);
+      getPilotos(signal);
+    }
+    catch (error) {
+      console.log(error);
+    } 
+  }
+
+  const eliminarVehiculo = async (vehiculo) => {
+    try {
+      const VehiculosHelper = new VehiculoHelperMethods(process.env.REACT_APP_EP); 
+      await VehiculosHelper.eliminarVehiculo(vehiculo);
       let signal = axios.CancelToken.source();      
       getTodosVehiculos(signal);
       getPilotos(signal);
@@ -293,7 +306,7 @@ const Vehiculos = () => {
         entitiesList={vehiculos}
         onCreate={enviarVehiculo}        
         onEdit={editarVehiculo}
-        onDelete={null}
+        onDelete={eliminarVehiculo}
         formFields={fields}
         columns={columns}
         reducer={VehiculosReducer}
