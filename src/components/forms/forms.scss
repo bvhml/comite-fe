@@ -146,3 +146,38 @@
         top: calc(100% + 0.125rem);
     }
 }
+
+.confirm-action {
+    width: 30rem;
+    background-color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border-radius: 0.25rem;
+    padding: 1.5rem;
+
+    &__message {
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+
+    &__buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        &--confirm {
+            background-color: #e04046 !important;
+            color: #ffffff !important;
+            margin-left: 1rem !important;
+        }
+
+        &--cancel {
+            background-color: #ffffff !important;
+            color: #e04046 !important;
+            border: 0.0625rem solid #e04046 !important;
+        }
+    }
+}
