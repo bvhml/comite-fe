@@ -54,7 +54,7 @@ const Vehiculos = () => {
     message: 'Ingrese el modelo',
     error: false,
     defaultValue: '',
-    type: 'text',
+    type: 'number',
     required: true
   }, { 
     label: 'Línea',
@@ -102,7 +102,7 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de cilindros válido',
     error: false,
-    type: 'text',
+    type: 'number',
     defaultValue: '',
     required: true
   }, { 
@@ -112,7 +112,7 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de toneladas válido',
     error: false,
-    type: 'text',
+    type: 'number',
     defaultValue: '',
     required: true
   }, { 
@@ -142,7 +142,7 @@ const Vehiculos = () => {
     validWhen: false,
     message: 'Ingrese un número de asientos válido',
     error: false,
-    type: 'text',
+    type: 'number',
     defaultValue: '',
     required: true
   }, { 

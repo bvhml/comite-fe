@@ -171,7 +171,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         onClose={()=> dispatch({ type: 'noEliminar'})}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
-                        children={<div><ConfirmAction message={`¿Está seguro de que desea eliminar este ${entityName}?`} confirmAction={() => { onDelete(entity) }} cancelAction={()=> dispatch({ type: 'noEliminar'})} confirmText="Eliminar" cancelText="Cancelar" /></div>}
+                        children={<div><ConfirmAction message={`¿Está seguro de que desea eliminar este ${entityName}?`} confirmAction={async () => { await onDelete(entity); dispatch({ type: 'noEliminar'}); }} cancelAction={()=> dispatch({ type: 'noEliminar'})} confirmText="Eliminar" cancelText="Cancelar" /></div>}
                     />
 
                     <Modal 
