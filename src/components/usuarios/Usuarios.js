@@ -51,8 +51,18 @@ const Usuarios = () => {
       value: rolesEnum.SUPPORT
     }]
   }, {
+    label: 'Título',
+    columnSize: '20%',
+    field: 'titulo',
+    validWhen: false,
+    message: 'Nombres requeridos',
+    error: false,
+    type: 'text',
+    defaultValue: '',
+    required: false
+  }, {
     label: 'Nombres',
-    columnSize: '40%',
+    columnSize: '30%',
     field: 'nombre',
     validWhen: false,
     message: 'Nombres requeridos',
@@ -62,7 +72,7 @@ const Usuarios = () => {
     required: true
   }, { 
     label: 'Apellido',
-    columnSize: '40%',
+    columnSize: '30%',
     field: 'apellido',
     validWhen: true,
     message: 'Apellidos requeridos',
