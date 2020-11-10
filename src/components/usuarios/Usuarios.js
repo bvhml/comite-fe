@@ -119,7 +119,7 @@ const Usuarios = () => {
     error: false,
     type: 'password',
     defaultValue: '',
-    required: false
+    required: true
   }];
   
   let columns= [

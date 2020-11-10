@@ -147,7 +147,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         onClose={handleClose}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
-                        children={<div><FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} dynamicClick={dynamicClick} /></div> }
+                        children={<div><FormularioEntidad title={`Nuevo ${entityName}`} fields={formFields} model={null} onSubmit={handleCreate} dynamicClick={dynamicClick} formAction="create" /></div> }
                     />
 
                     <Modal
@@ -163,7 +163,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                         onClose={()=> dispatch({ type: 'noEditar'})}
                         aria-labelledby="simple-modal-title"
                         aria-describedby="simple-modal-description"
-                        children={<div><FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} /></div>}
+                        children={<div><FormularioEntidad title={`Editar ${entityName}`} fields={formFields} model={entity} onSubmit={handleEdit} formAction="edit" /></div>}
                     />
 
                     <Modal

@@ -5,7 +5,7 @@ import { withFormik, Field, Form } from 'formik'
 import SelectEntidad from './SelectEntidad'
 import moment from 'moment';
 
-const FormularioEntidad = ({ title, fields, dynamicClick, resetForm, values, setValues }) => {
+const FormularioEntidad = ({ title, fields, dynamicClick, resetForm, values, setValues, formAction }) => {
 
     const handleDynamicClick = () => {       
         dynamicClick();
@@ -49,7 +49,7 @@ const FormularioEntidad = ({ title, fields, dynamicClick, resetForm, values, set
                                                 <div style={{ width: fieldItem.columnSize, display: 'inline-block', padding: '1rem' }} key={fieldItem.field}>
                                                     <FormControl fullWidth={true} margin="dense">
                                                         <InputLabel htmlFor={fieldItem.field} className="formulario-entidad__label">{fieldItem.label}</InputLabel>
-                                                        <Input className="formulario-entidad__input" type={fieldItem.type} {...field} required={fieldItem.required} readOnly={fieldItem.readOnly} />
+                                                        <Input className="formulario-entidad__input" type={fieldItem.type} autoComplete="off" {...field} required={fieldItem.required && (fieldItem.type !== 'password' || formAction === 'create')} readOnly={fieldItem.readOnly} />
                                                         { meta.touched && meta.error && <div className="error">{meta.error}</div> }
                                                     </FormControl>
                                                 </div>
@@ -98,7 +98,7 @@ export default withFormik({
             if(values[field.field] && field.type === 'number' && values[field.field] <= 0) {
                 errors[field.field] = 'La cantidad debe ser mayor que cero';
             }
-            if(!values[field.field] && field.required){
+            if(!values[field.field] && field.required && (field.type !== 'password' || props.formAction === 'create')){
                 errors[field.field] = 'Este campo es requerido';
             }
         });
