@@ -28,44 +28,59 @@ const ViajeSolicitante = ({ user }) => {
   
   const initialFieldsState = [{ 
     label: 'Fecha',
-    columnSize: '22%',
+    columnSize: '25%',
     field: 'fecha_0',
     validWhen: false,
     message: 'Este campo es requerido',
     error: false,
     type: 'datetime-local',
     required: true,
-    defaultValue: nowDate
+    defaultValue: nowDate,
+    wrapGroup: 1
   }, { 
     label: 'Dirección de origen',
-    columnSize: '33%',
+    columnSize: '37.5%',
     field: 'ubicacion_inicio_0',
     validWhen: false,
     message: 'Ingrese la dirección de origen',
     error: false,
     type: 'text',
     required: true,
-    defaultValue: ''
+    defaultValue: '',
+    wrapGroup: 1
   }, { 
     label: 'Dirección de destino',
-    columnSize: '33%',
+    columnSize: '37.5%',
     field: 'ubicacion_fin_0',
     validWhen: false,
     message: 'Este campo es requerido',
     error: false,
     type: 'text',
     required: true,
-    defaultValue: ''
+    defaultValue: '',
+    wrapGroup: 1
   }, { 
     label: 'Personas',
-    columnSize: '12%',
+    columnSize: '20%',
     field: 'numero_personas_0',
     validWhen: false,
     message: 'Este campo es requerido',
     error: false,
     type: 'number',
     required: true,
-    defaultValue: 1
+    defaultValue: 1,
+    wrapGroup: 1
+  }, { 
+    label: 'Notas',
+    columnSize: '80%',
+    field: 'notas_0',
+    validWhen: false,
+    message: 'Este campo es requerido',
+    error: false,
+    type: 'text',
+    required: false,
+    defaultValue: '',
+    wrapGroup: 1
   }, { 
     label: 'Agregar ruta',
     columnSize: '20%',
@@ -75,7 +90,8 @@ const ViajeSolicitante = ({ user }) => {
     error: false,
     type: 'dynamic',
     childFields: ['fecha', 'ubicacion_inicio', 'ubicacion_fin', 'numero_personas'],
-    required: false
+    required: false,
+    wrapGroup: 0
   }, { 
     label: 'Aprobar por director',
     columnSize: '100%',
@@ -87,9 +103,10 @@ const ViajeSolicitante = ({ user }) => {
     required: false,
     defaultValue: -1,
     options: [{
-      label: 'No solicitar',
+      label: 'No solicitar autorización',
       value: -1
-    }]
+    }],
+    wrapGroup: 0
   }]; 
   const [fields, setFields] = useState([].concat(initialFieldsState));
   const [pilotsAssignmentFields, setPilotAssignmentFields] = useState([]);
@@ -117,54 +134,71 @@ const ViajeSolicitante = ({ user }) => {
   
   const dynamicClick = (data) => {    
 
-    const index = ((fields.length - 6) / 4) + 1;
+    const index = ((fields.length - 7) / 5) + 1;
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Fecha',
-      columnSize: '22%',
+      columnSize: '25%',
       field: 'fecha_' + index,
       validWhen: false,
       message: 'Este campo es requerido',
       error: false,
       type: 'datetime-local',
       required: true,
-      defaultValue: data && data.fecha || nowDate
+      defaultValue: data && data.fecha || nowDate,
+      wrapGroup: index + 1
     });
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Dirección de origen',
-      columnSize: '33%',
+      columnSize: '37.5%',
       field: 'ubicacion_inicio_' + index,
       validWhen: false,
       message: 'Ingrese la dirección de origen',
       error: false,
       type: 'text',
       required: true,
-      defaultValue: data && data.ubicacion_inicio || ''
+      defaultValue: data && data.ubicacion_inicio || '',
+      wrapGroup: index + 1
     })
 
     fields.splice(fields.length - 2, 0, { 
       label: 'Dirección de destino',
-      columnSize: '33%',
+      columnSize: '37.5%',
       field: 'ubicacion_fin_' + index,
       validWhen: false,
       message: 'Este campo es requerido',
       error: false,
       type: 'text',
       required: true,
-      defaultValue: data && data.ubicacion_fin || ''
+      defaultValue: data && data.ubicacion_fin || '',
+      wrapGroup: index + 1
     });
     
     fields.splice(fields.length - 2, 0, { 
       label: 'Personas',
-      columnSize: '12%',
+      columnSize: '20%',
       field: 'numero_personas_' + index,
       validWhen: false,
       message: 'Este campo es requerido',
       error: false,
       type: 'number',
       required: true,
-      defaultValue: data && data.numero_personas || 1
+      defaultValue: data && data.numero_personas || 1,
+      wrapGroup: index + 1
+    });
+    
+    fields.splice(fields.length - 2, 0, { 
+      label: 'Notas',
+      columnSize: '80%',
+      field: 'notas_' + index,
+      validWhen: false,
+      message: 'Este campo es requerido',
+      error: false,
+      type: 'text',
+      required: false,
+      defaultValue: data && data.notas || '',
+      wrapGroup: index + 1
     });
 
     setFields(fields);
@@ -192,7 +226,8 @@ const ViajeSolicitante = ({ user }) => {
             }            
           })
           return options;
-        }, [])
+        }, []),
+        wrapGroup: index + 1
       })
       setPilotAssignmentFields(pilotsAssignmentFields);
 
@@ -311,7 +346,7 @@ const ViajeSolicitante = ({ user }) => {
       if (directores) {
         directores = directores.map(res => {
           return {
-            label: `${res.nombre} ${res.apellido}`,
+            label: `${res.nombre} ${res.apellido}${res.titulo ? ` - ${res.titulo}` : ''}`,
             value: res.id
           }
         })

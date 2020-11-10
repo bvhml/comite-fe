@@ -49,7 +49,8 @@ const Usuarios = () => {
     }, {
       label: getRoleText(rolesEnum.SUPPORT),
       value: rolesEnum.SUPPORT
-    }]
+    }],
+    wrapGroup: 0
   }, {
     label: 'Título',
     columnSize: '20%',
@@ -59,7 +60,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: false
+    required: false,
+    wrapGroup: 0
   }, {
     label: 'Nombres',
     columnSize: '30%',
@@ -69,7 +71,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Apellido',
     columnSize: '30%',
@@ -79,7 +82,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Edad',
     columnSize: '40%',
@@ -89,7 +93,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'DPI',
     columnSize: '60%',
@@ -99,7 +104,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Correo electrónico',  
     columnSize: '100%',
@@ -109,7 +115,8 @@ const Usuarios = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Contraseña',  
     columnSize: '100%',
@@ -119,7 +126,8 @@ const Usuarios = () => {
     error: false,
     type: 'password',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }];
   
   let columns= [

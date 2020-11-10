@@ -5,6 +5,7 @@ import axios from 'axios';
 import './vehiculos.scss';
 import MantenimientosReducer from '../../reducers/MantenimientosReducer';
 import TablaEntidad from '../forms/TablaEntidad';
+import moment from 'moment';
 
 const Mantenimientos = ({ entityId, onClose }) => {
   
@@ -16,7 +17,7 @@ const Mantenimientos = ({ entityId, onClose }) => {
     showError: false,
     isLoggedIn: false,
     open: false,
-    editar: false,
+    editar: false
   };
 
   const initialFieldsState = [{ 
@@ -28,7 +29,8 @@ const Mantenimientos = ({ entityId, onClose }) => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Fecha',
     columnSize: '50%',
@@ -38,7 +40,8 @@ const Mantenimientos = ({ entityId, onClose }) => {
     error: false,
     type: 'date',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Descripción',
     columnSize: '100%',
@@ -48,7 +51,8 @@ const Mantenimientos = ({ entityId, onClose }) => {
     error: false,
     type: 'textarea',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }];
   
   let columns= [
@@ -68,7 +72,7 @@ const Mantenimientos = ({ entityId, onClose }) => {
       title: 'Fecha', 
       field: 'fecha',
       searchable:true,
-      render: rowData => <div style={{color:'cornflowerblue'}}>{rowData.fecha}</div>
+      render: rowData => <div style={{color:'cornflowerblue'}}>{moment(rowData.fecha).format('DD/MM/YYYY')}</div>
     },
   ];
 

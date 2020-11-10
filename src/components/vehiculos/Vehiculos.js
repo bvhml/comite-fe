@@ -35,7 +35,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, {
     label: 'Placa',
     columnSize: '20%',
@@ -45,7 +46,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Modelo',
     columnSize: '20%',
@@ -55,7 +57,8 @@ const Vehiculos = () => {
     error: false,
     defaultValue: '',
     type: 'number',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Línea',
     columnSize: '30%',
@@ -65,7 +68,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Tipo',
     columnSize: '20%',
@@ -75,7 +79,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Chasis',
     columnSize: '40%',
@@ -85,7 +90,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Motor',
     columnSize: '40%',
@@ -94,7 +100,8 @@ const Vehiculos = () => {
     message: 'Ingrese el tamaño del motor',
     error: false,
     type: 'text',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Cilindros',
     columnSize: '30%',
@@ -104,7 +111,8 @@ const Vehiculos = () => {
     error: false,
     type: 'number',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Toneladas',
     columnSize: '30%',
@@ -114,7 +122,8 @@ const Vehiculos = () => {
     error: false,
     type: 'number',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Transmisión',
     columnSize: '40%',
@@ -134,7 +143,8 @@ const Vehiculos = () => {
     }, {
       label: 'Tiptronic',
       value: 'Tiptronic'
-    }]
+    }],
+    wrapGroup: 0
   }, { 
     label: 'Número de asientos',
     columnSize: '50%',
@@ -144,7 +154,8 @@ const Vehiculos = () => {
     error: false,
     type: 'number',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Color',
     columnSize: '50%',
@@ -154,7 +165,8 @@ const Vehiculos = () => {
     error: false,
     type: 'text',
     defaultValue: '',
-    required: true
+    required: true,
+    wrapGroup: 0
   }, { 
     label: 'Piloto',
     columnSize: '100%',
@@ -165,7 +177,8 @@ const Vehiculos = () => {
     type: 'select',
     required: true,
     defaultValue: '',
-    options: []
+    options: [],
+    wrapGroup: 0
   }]
 
   const [ vehiculos, setVehiculos ] = useState([])

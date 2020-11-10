@@ -110,11 +110,12 @@
                 padding: 0 0.5rem;
                 &__wrapper {                    
                     display: grid;
-                    grid-template-columns: 2fr 2fr 1fr 1fr;
+                    grid-template-columns: 2fr 2fr 1fr 1.5fr 2.5fr;
                     margin-bottom: 2.5rem;
+                    grid-gap: 1.125rem;
 
                     &--assignment {
-                        grid-template-columns: 2fr 2fr 1fr 2fr 12rem;
+                        grid-template-columns: 2fr 2fr 1fr 2fr 2.5fr 12rem;
                     }
 
                     &:last-child {
@@ -180,4 +181,11 @@
             border: 0.0625rem solid #e04046 !important;
         }
     }
+}
+
+.wrapped-form {
+    padding: 0 1rem 1.5rem 1rem;
+    border: 0.0625rem solid #5a5a5a;
+    border-radius: 0.25rem;
+    margin: 1rem 1rem 2rem 1rem;
 }

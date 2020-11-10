@@ -21,6 +21,7 @@ export default class ViajesHelperMethods {
                     case 'ubicacion_inicio_':
                     case 'ubicacion_fin_':
                     case 'numero_personas_':
+                    case 'notas_':
                         const index = Number.parseInt(viajePropKey.substring(viajePropKey.length - 1, viajePropKey.length));
                         if(!viaje.rutas[index]) {
                             viaje.rutas[index] = {

@@ -3,6 +3,7 @@ import { Button } from '@material-ui/core';
 import { withFormik, Field, Form } from 'formik';
 import SelectEntidad from './SelectEntidad';
 import { statusEnum } from '../../enums/StatusEnum';
+import moment from 'moment'
 
 const PresentacionEntidad = ({ entity, values, fields, enableAssignment, enableAproval, onAprove, onAssign, onStart, onFinish, onDeny, closeModal, assigneesFieldData }) => {
 
@@ -84,7 +85,9 @@ const PresentacionEntidad = ({ entity, values, fields, enableAssignment, enableA
                                                             return field ? (
                                                                 <div className="presentacion-entidad__array__content__item" key={arrayItemProperty}>
                                                                     <div className="presentacion-entidad__array__content__item__label">{field.label}</div>
-                                                                    <div className="presentacion-entidad__array__content__item__content">{arrayItem[arrayItemProperty]}</div>
+                                                                    { field.type === 'datetime-local' ? 
+                                                                        <div className="presentacion-entidad__array__content__item__content">{moment(arrayItem[arrayItemProperty]).format('DD/MM/YYYY hh:mm')}</div> : 
+                                                                        <div className="presentacion-entidad__array__content__item__content">{arrayItem[arrayItemProperty]}</div> }
                                                                 </div>                                                            
                                                             ) : '';
                                                         })                                        
