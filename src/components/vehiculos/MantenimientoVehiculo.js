@@ -174,6 +174,8 @@ const Mantenimientos = ({ entityId, onClose }) => {
         resetFormStructure={resetFormStructure}
         enableEdit
         enableDelete
+        enableCreate
+        enableFiltering
       />
     </div>    
   );

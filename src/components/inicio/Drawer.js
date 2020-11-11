@@ -23,6 +23,7 @@ import { rolesEnum } from '../../enums/RolesEnum';
 
 import './inicio.css'
 import ViajeSolicitante from '../viajes/ViajesSolicitante';
+import BitacoraAcciones from '../bitacora/BitacoraAcciones';
 
 
 export default function PersistentDrawerLeft({ classes, mobile }) {
@@ -74,7 +75,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
   const getComponent = (pagina, classes, mobile) => {
     switch(pagina) {
       case 'vehiculos': 
-        if(usuario.rol !== rolesEnum.ADMINISTRADOR) {
+        if(usuario.rol !== rolesEnum.ADMINISTRADOR && usuario.rol !== rolesEnum.SUPPORT) {
           history.push('/home/viaje');
           break;
         }
@@ -87,11 +88,13 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         }
         return <Usuarios classes={classes} mobile={mobile}/>
       case 'viajes':
-        if(usuario.rol === rolesEnum.SUPPORT) {
-          history.push('/home/usuarios');
+        return <ViajeSolicitante user={usuario} />
+      case 'bitacora':
+        if(usuario.rol !== rolesEnum.SUPPORT) {
+          history.push('/home/viaje');
           break;
         }
-        return <ViajeSolicitante user={usuario} />
+        return <BitacoraAcciones user={usuario} />
       
       default: return <ViajeSolicitante user={usuario} />
     }
@@ -115,7 +118,7 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
         <List>
 
           {usuario ? 
-            ((usuario.rol === rolesEnum.ADMINISTRADOR)? 
+            (usuario.rol === rolesEnum.ADMINISTRADOR || usuario.rol === rolesEnum.SUPPORT ? 
           <ListItem button key={'Vehiculos'} selected={navOption === 'vehiculos'} onClick={()=>{selectNavOption('vehiculos')}}>
             <ListItemIcon>{<CommuteIcon onClick={()=>{history.push('/home/vehiculos')}}/>}</ListItemIcon>
             <ListItemText primary={'Vehiculos'}/>
@@ -128,9 +131,17 @@ export default function PersistentDrawerLeft({ classes, mobile }) {
             <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/usuarios')}}/></ListItemIcon>
             <ListItemText primary={'Usuarios'}/>
           </ListItem>
+          )}          
+
+          {usuario &&
+          ((usuario.rol === rolesEnum.SUPPORT) &&
+          <ListItem button key={'Bitacora'} selected={navOption === 'bitacora'} onClick={()=>{selectNavOption('bitacora')}}>
+            <ListItemIcon><AssignmentIndIcon onClick={()=>{history.push('/home/bitacora')}}/></ListItemIcon>
+            <ListItemText primary={'Bitácora de acciones'}/>
+          </ListItem>
           )}
 
-          {usuario  && usuario.rol !== rolesEnum.SUPPORT &&
+          {usuario &&
           <ListItem button key={'Viajes'} selected={navOption === 'viaje'} onClick={()=>{selectNavOption('viaje')}}>
             <ListItemIcon><CommuteIcon onClick={()=>{history.push('/home/viaje')}}/></ListItemIcon>
             <ListItemText primary={'Viajes'}/>

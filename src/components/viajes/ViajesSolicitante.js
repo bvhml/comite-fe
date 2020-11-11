@@ -426,6 +426,8 @@ const ViajeSolicitante = ({ user }) => {
       resetFormStructure={resetFormStructure}
       entityToFormFields={entityToFormFields}
       enableView
+      enableCreate
+      enableFiltering
       permissions={permissions}
       assigneesFieldData={pilotsAssignmentFields}
     />

@@ -331,6 +331,8 @@ const Vehiculos = () => {
         enableEdit
         enableDelete
         enebaleMaintenance
+        enableCreate
+        enableFiltering
       />
     );
 }

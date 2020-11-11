@@ -239,6 +239,8 @@ const Usuarios = () => {
       resetFormStructure={resetFormStructure}
       enableEdit
       enableDelete
+      enableCreate
+      enableFiltering
     />
   );
 }

@@ -9,7 +9,7 @@ import PresentacionEntidad from './PresentacionEntidad';
 import ConfirmAction from './ConfirmAction';
 
 
-const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure, entityToFormFields, permissions, assigneesFieldData }) => {
+const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, columns, reducer, initialState, entitiesListName, entityName, sideModalComponentRender, enableEdit, enableDelete, enableView, enebaleMaintenance, dynamicClick, resetFormStructure, entityToFormFields, permissions, assigneesFieldData, enableCreate, enableFiltering }) => {
 
     // Hooks
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -99,9 +99,12 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
         <Grid container style={{backgroundColor:'whitesmoke', width:'100%'}}>
             <div className="tabla-entidad">
                 <div className="tabla-entidad__encabezado">
-                    <Grid container justify='flex-end'>
-                        <Button className="tabla-entidad__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar {entityName}</Button>
-                    </Grid> 
+                    {
+                        enableCreate &&
+                        <Grid container justify='flex-end'>
+                            <Button className="tabla-entidad__boton-agregar" variant="contained" onClick={handleOpen}>Ingresar {entityName}</Button>
+                        </Grid> 
+                    }
 
                     <Grid container style={{minHeight:'80vh', marginTop:'20px'}}>
                         { entitiesList && (entitiesList.length > 0) && !isLoading && 
@@ -117,7 +120,7 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
                                 searchFieldAlignment:'left',
                                 defaultGroupOrder:'0',
                                 exportButton: true,
-                                filtering: true,
+                                filtering: enableFiltering,
                                 pageSize: 10,
                                 actionsColumnIndex: -1,
                                 rowStyle:{backgroundColor:'whitesmoke',
