@@ -102,10 +102,7 @@ const ViajeSolicitante = ({ user }) => {
     type: 'select',
     required: false,
     defaultValue: -1,
-    options: [{
-      label: 'No solicitar autorización',
-      value: -1
-    }],
+    options: [],
     wrapGroup: 0
   }]; 
   const [fields, setFields] = useState([].concat(initialFieldsState));
@@ -352,7 +349,10 @@ const ViajeSolicitante = ({ user }) => {
         })
         fields.forEach(field => {
           if(field.field === 'id_director') {
-            field.options = field.options.concat(directores);
+            field.options = [{
+              label: 'No solicitar autorización',
+              value: -1
+            }].concat(directores);
           }
         });
         await mapPilotosToViaje(viajes, signal);
@@ -408,8 +408,11 @@ const ViajeSolicitante = ({ user }) => {
     }
   }
 
-  const resetFormStructure = () => {
+  const resetFormStructure = async () => {
+    let signal = axios.CancelToken.source()
     setFields(initialFieldsState)
+    await getUsers(signal, viajes);
+    setViajes(viajes);
   }
 
   return (

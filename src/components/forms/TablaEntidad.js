@@ -22,8 +22,8 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
     };
 
     const handleClose = () => {
-        dispatch({ type: 'hideModal' });
         resetFormStructure();
+        dispatch({ type: 'hideModal' });
     };
 
     const handleCreate = async entity => {
@@ -32,9 +32,9 @@ const TablaEntidad = ({ entitiesList, onCreate, onEdit, onDelete, formFields, co
     }
 
     const handleEdit = async entity => {
-        await onEdit(entity);
-        dispatch({ type: 'noEditar'});        
+        await onEdit(entity);       
         resetFormStructure();
+        dispatch({ type: 'noEditar'}); 
     }
 
     // Lifecycle
