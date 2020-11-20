@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import FormValidator from './FormValidator'
+import FormValidator from '../../utils/FormValidator'
 import validator from 'validator'
 import Info from '@material-ui/icons/Info'
 import Avatar from '@material-ui/core/Avatar';
@@ -20,6 +20,11 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Slide from '@material-ui/core/Slide';
+import { rolesEnum } from '../../enums/RolesEnum';
+import { useHistory } from 'react-router-dom';
+import UserHelperMethods from '../../helpers/UserHelperMethods';
+import Hidden from '@material-ui/core/Hidden';
+import axios from 'axios';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -112,18 +117,34 @@ let validationResponse =  {};
 
 const SignInForm =  ({classes, mobile}) => {
 
-
+  const history = useHistory();
   const Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
-  const { from } = { from: { pathname: "/me" } };
   
   const [state, dispatch] = useReducer(loginReducer, initialState);
+  const [usuario, setUsuario] = useState({});
   const { username, password, isLoading, error, showError } = state;
 
   useEffect(() =>{
     if (!Auth.loggedIn()){
       Auth.logout();
     }
-  }, [Auth]);
+  }, [Auth]);  
+
+  const initializeSessionByRole = () => {
+    switch(usuario.rol) {
+      case rolesEnum.PILOTO:
+      case rolesEnum.SOLICITANTE:
+      case rolesEnum.DIRECTOR:
+        history.push('/home/viaje');
+        break;
+      case rolesEnum.ADMINISTRADOR:
+        history.push('/home/vehiculos');
+        break;
+      case rolesEnum.SUPPORT:
+        history.push('/home/usuarios');
+        break;
+    }
+  }
   
   function handleSubmit(e){
     
@@ -135,11 +156,17 @@ const SignInForm =  ({classes, mobile}) => {
     
     if (validation.isValid) {
       Auth.login(username, password)
-        .then(res => {
+        .then(async res => {
           if (res.data.status === 400) {
             dispatch({ type: 'error' });
           }
           else if (res.data.status === 200){
+            localStorage.setItem("usuario", res.data.user);
+            let signal = axios.CancelToken.source();
+            const UserHelperMethodsInstance = new UserHelperMethods(process.env.REACT_APP_EP); 
+            const response = await UserHelperMethodsInstance.buscarUsuario(res.data.user, signal.token)
+            setUsuario(response)
+            initializeSessionByRole();
             dispatch({ type: 'success' });
           }
         })
@@ -156,10 +183,10 @@ const SignInForm =  ({classes, mobile}) => {
   } 
 
   if (Auth.loggedIn()) {
-    return <Redirect to={from}/>;
+    initializeSessionByRole();
   }
     return(
-      <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'3vh 12vh', height:'auto'}}>
+      <Grid container component="main" className={classes.root} fixed = {'true'} justify={'center'} style={{padding: !mobile ? '1vh':'3vh 12vh', height:'auto', minHeight:'100vh'}}>
         <CssBaseline />
         <Grid container item xs={12} md={7} lg={5} component={Paper} elevation={6}>
           <Grid container item className={classes.paper} justify={'center'} spacing={6}>
@@ -239,7 +266,7 @@ const SignInForm =  ({classes, mobile}) => {
                 })}
                 />
                 <Grid container item justify='flex-end' style={{fontSize:'12px'}}>
-                <LinkRouter.Link to="/register" className={classes.Link} style={{ textDecoration: 'none' }}>
+                <LinkRouter.Link to="/" className={classes.Link} style={{ textDecoration: 'none' }}>
                   Olvide mi contraseña
                 </LinkRouter.Link>
                 </Grid>  
@@ -277,8 +304,10 @@ const SignInForm =  ({classes, mobile}) => {
               </form>
             </Grid>  
           </Grid>
-        </Grid>  
-        <Grid item xs={false} sm={5} md={7} component={Paper} className={classes.image} elevation={5} square style={{borderRadius: '0px 3px 3px 0px'}}/>
+        </Grid> 
+        <Hidden mdDown>
+          <Grid item xs={false} sm={5} md={7} component={Paper} className={classes.image} elevation={5} square style={{borderRadius: '0px 3px 3px 0px'}}/>
+        </Hidden> 
       </Grid>
     );
     

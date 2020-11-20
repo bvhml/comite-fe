@@ -5,10 +5,12 @@ import blue from '@material-ui/core/colors/blue';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import SignInForm from './components/auth/SignInForm';
-import Me from './components/auth/Me';
 import AuthHelperMethods from './helpers/AuthHelperMethods';
 import PirateTheme from './PirateTheme';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Register from './components/auth/Register';
+import { Inicio } from './components/inicio';
+import { ToastProvider } from 'react-toast-notifications';
 
 let theme = PirateTheme;
 
@@ -19,7 +21,6 @@ export default function App (props) {
 
   
   const mobile = useMediaQuery('(min-width:600px)');
-  
   let useStyles = makeStyles(theme => ({
     root: {
       height:  '100vh',
@@ -41,6 +42,7 @@ export default function App (props) {
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      backgroundImage: 'url(\'/cars-moving.gif\')',
       background:'linear-gradient(90deg, rgba(0,145,212,1) 0%, rgba(1,126,211,1) 35%, rgba(1,102,212,1) 100%);'
     },
     paper: {
@@ -168,9 +170,8 @@ export default function App (props) {
   let Auth = new AuthHelperMethods(process.env.REACT_APP_EP);
 
   function ProtectedRoute(){
-    return <Me classes={classes}/>
+    return <Inicio classes={classes} mobile={mobile}/>
   }  
-
   
   function PrivateRoute({ component: Component, ...rest }) {
     return (
@@ -192,12 +193,18 @@ export default function App (props) {
   }
     return (
       <ThemeProvider theme={theme}>
-        <Router>
-          <Route path="/" exact>
-            <SignInForm classes={classes} mobile={mobile}/>
-          </Route>
-          <PrivateRoute path="/me" component={ProtectedRoute} />
-        </Router>
+        <ToastProvider placement={'bottom-center'}>
+          <Router>
+            <Route path="/" exact>
+              <SignInForm classes={classes} mobile={mobile}/>
+            </Route>
+            <Route path="/registrarse" exact>
+              <Register classes={classes} mobile={mobile}/>
+            </Route>
+            <PrivateRoute path="/home/:pagina" component={ProtectedRoute}/>
+            <PrivateRoute path="/home/:pagina/:entidad" component={ProtectedRoute}/>
+          </Router>
+        </ToastProvider>
       </ThemeProvider>
     );
 }

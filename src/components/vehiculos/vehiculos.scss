@@ -1,0 +1,23 @@
+.vehiculos {
+    padding: 2rem;
+    width: 100%;
+    background-color: 'whitesmoke';
+    &__encabezado {
+        width: 100%;
+    }
+
+    &__boton-agregar {
+        background-color: #e04046 !important;
+        color: #ffffff !important;
+        float: right;
+        margin-bottom: '100px';
+        text-transform: 'none';
+    }
+}
+
+.mantenimientos {
+    width: 50%;
+    right: 0;
+    position: absolute;
+    padding: 0;
+}

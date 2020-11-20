@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
-import FormValidator from './FormValidator'
+import FormValidator from '../../utils/FormValidator'
 import validator from 'validator'
 import { Redirect } from "react-router-dom";
 import AuthHelperMethods from '../../helpers/AuthHelperMethods';
@@ -41,6 +41,7 @@ export const validatorArg = new FormValidator([
         password:'',
         messageDialog:'',
         showDialog:false,
+        bandera:false,
       });
  
    

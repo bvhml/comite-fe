@@ -16,7 +16,7 @@ export default class AuthHelperMethods {
           };
     }
 
-    return axios.post(`http://${this.domain}/users/login`, {
+    return axios.post(`http://${this.domain}/usuarios/login`, {
         email: username,
         password: password
       },config)
@@ -25,7 +25,7 @@ export default class AuthHelperMethods {
 
     }
 
-    signUp = (username,password,nombre,apellido) => {
+    signUp = async (usuario) => {
       // Get a token from api server using the fetch api
       var config = {};
       if (this.loggedIn()) {
@@ -34,19 +34,55 @@ export default class AuthHelperMethods {
             };
       }
   
-      return axios.post(`http://${this.domain}/users/register`, {
-          email: username,
-          password: password,
-          nombre:nombre,
-          apellido:apellido,
-        },config)
-        .then(this._checkStatus)
+      return axios.post(`http://${this.domain}/usuarios/register`, usuario, config)
         .then(response => {
           //this.login(username,password)
           return response.data;
         });
   
       }
+
+      resetPassword = (username,password) => {
+        // Get a token from api server using the fetch api
+        var config = {};
+        console.log(this.loggedIn());
+        if (this.loggedIn()) {
+            config = {
+                headers: { Authorization: "bearer " + this.getToken() }
+              };
+        }
+    
+        return axios.post(`http://${this.domain}/usuarios/resetpassword`, {
+            username: username,
+            password: password,
+          },config)
+          .then(response => {
+            //this.login(username,password)
+            return response.data;
+          });
+    
+        }
+
+        resetMyPassword = (username,password) => {
+          // Get a token from api server using the fetch api
+          var config = {};
+          console.log(this.loggedIn());
+          if (this.loggedIn()) {
+              config = {
+                  headers: { Authorization: "bearer " + this.getToken() }
+                };
+          }
+      
+          return axios.post(`http://${this.domain}/usuarios/resetmypassword`, {
+              username: username,
+              password: password,
+            },config)
+            .then(response => {
+              //this.login(username,password)
+              return response.data;
+            });
+      
+          }
 
       validateMe = () => {
         // Get a token from api server using the fetch api

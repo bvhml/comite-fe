@@ -1,0 +1,36 @@
+.cerrar-sesion {
+    padding: 0.25rem 1rem;
+    position: absolute;
+    bottom: 2rem;
+    font-size: 1rem;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+}
+
+.cerrar-sesion span {
+    margin-left: 2rem;
+}
+
+.menu-principal {
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: 1.25fr 5fr;
+}
+
+.menu-principal .MuiDrawer-paperAnchorDockedLeft {
+    position: relative;
+}
+
+.menu-principal__logo {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.menu-principal__logo img {
+    width: 70% !important;
+}
+
+.display-none {
+    display: none !important;
+}
