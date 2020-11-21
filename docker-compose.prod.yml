@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+
+  comite-prod:
+    container_name: comite-prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - '1337:80'
